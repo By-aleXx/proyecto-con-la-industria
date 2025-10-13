@@ -1,0 +1,13 @@
+/* Archivo principal de estilos - Importa todos los estilos del proyecto */
+
+/* Estilos globales y variables */
+@import './global.css';
+
+/* Estilos de componentes específicos */
+@import './LoginPage.css';
+@import './SelectionComponents.css';
+@import './ChatRecommendations.css';
+@import './LoadingAndError.css';
+
+/* Estilos adicionales específicos del proyecto */
+/* Aquí se pueden agregar más estilos específicos si es necesario */
