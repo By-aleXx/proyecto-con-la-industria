@@ -1,17 +1,26 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import anime from 'animejs';
+import { useAuth } from '../context/AuthContext';
+import chatService from '../services/chatService';
 import LoadingScreen from './LoadingScreen';
 import ThemeToggle from './ThemeToggle';
+import ChangePasswordModal from './ChangePasswordModal';
 import '../estilos/MainMenu.css';
 import '../estilos/ChatRecommendations.css';
 
-const MainMenu = ({ userName, onGoToChat, onLogout, isDark, clientType, selectedArea, selectedSearch, onToggleTheme }) => {
+const MainMenu = () => {
+  const { user, logout, changePassword } = useAuth();
+  const navigate = useNavigate();
+  
   const [selectedOption, setSelectedOption] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState('Cargando...');
   const [selectedImage, setSelectedImage] = useState(null);
   const [toastMessage, setToastMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
+  const [isDark, setIsDark] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
   const fileInputRef = React.useRef(null);
 
   // Función para manejar el click en el botón de foto
@@ -74,94 +83,55 @@ const MainMenu = ({ userName, onGoToChat, onLogout, isDark, clientType, selected
     });
   }, []);
 
-  const getMenuOptionsForClientType = () => {
-    const baseOptions = [
-      {
-        id: 1,
-        text: '¿En qué te puedo ayudar?',
-        subtitle: userName || '',
-        icon: '💬',
-        action: () => handleOptionClick('help')
-      }
-    ];
-
-    if (clientType === 'professional') {
-      // Opciones específicas para Arquitectos/Ingenieros
-      return [
-        ...baseOptions,
-        {
-          id: 2,
-          type: 'technical',
-          text: 'Especificaciones técnicas de pisos',
-          icon: '📐',
-          action: () => handleOptionClick('technical')
-        },
-        {
-          id: 3,
-          type: 'catalog',
-          text: 'Catálogo profesional y precios',
-          icon: '📊',
-          action: () => handleOptionClick('catalog')
-        },
-        {
-          id: 4,
-          type: 'calculator',
-          text: 'Calculadora de m² y cantidades',
-          icon: '📏',
-          action: () => handleOptionClick('calculator')
-        },
-        {
-          id: 5,
-          type: 'support',
-          text: 'Soporte técnico especializado',
-          icon: '🔧',
-          action: () => handleOptionClick('support')
-        }
-      ];
-    } else {
-      // Opciones para Particulares
-      return [
-        ...baseOptions,
-        {
-          id: 2,
-          type: 'catalog',
-          text: 'Ver catálogo de pisos',
-          icon: '🏠',
-          action: () => handleOptionClick('catalog')
-        },
-        {
-          id: 3,
-          type: 'budget',
-          text: 'Calcular presupuesto',
-          icon: '💰',
-          action: () => handleOptionClick('budget')
-        },
-        {
-          id: 4,
-          type: 'tips',
-          text: 'Consejos de instalación',
-          icon: '🔨',
-          action: () => handleOptionClick('tips')
-        },
-        {
-          id: 5,
-          type: 'advisor',
-          text: 'Contactar asesor',
-          icon: '👨‍💼',
-          action: () => handleOptionClick('advisor')
-        }
-      ];
+  const menuOptions = [
+    {
+      id: 1,
+      text: '¿En qué te puedo ayudar?',
+      subtitle: user?.first_name || user?.username || '',
+      icon: '💬',
+      action: () => handleOptionClick('help')
+    },
+    {
+      id: 2,
+      type: 'catalog',
+      text: 'Ver catálogo de pisos',
+      icon: '🏠',
+      action: () => handleOptionClick('catalog')
+    },
+    {
+      id: 3,
+      type: 'budget',
+      text: 'Calcular presupuesto',
+      icon: '💰',
+      action: () => handleOptionClick('budget')
+    },
+    {
+      id: 4,
+      type: 'tips',
+      text: 'Consejos de instalación',
+      icon: '🔨',
+      action: () => handleOptionClick('tips')
+    },
+    {
+      id: 5,
+      type: 'advisor',
+      text: 'Contactar asesor',
+      icon: '👨‍💼',
+      action: () => handleOptionClick('advisor')
     }
-  };
+  ];
 
   const handleOptionClick = (optionType) => {
     setSelectedOption(optionType);
+    
+    if (optionType === 'help') {
+      // Ir directamente al chat
+      navigate('/chat');
+      return;
+    }
+    
     const loadingTexts = {
-      'help': 'Conectando con asistente...',
-      'technical': 'Cargando especificaciones técnicas...',
       'catalog': 'Preparando catálogo...',
-      'calculator': 'Iniciando calculadora...',
-      'support': 'Conectando con soporte técnico...',
       'budget': 'Calculando presupuesto...',
       'tips': 'Cargando consejos...',
       'advisor': 'Conectando con asesor...'
@@ -174,21 +144,32 @@ const MainMenu = ({ userName, onGoToChat, onLogout, isDark, clientType, selected
     setTimeout(() => {
       setIsLoading(false);
 
-      // Si la opción no es 'help', mostrar el mensaje de desarrollo
-      if (optionType !== 'help') {
-        const displayName = userName || 'amigo';
-        const msg = `Función "${optionType}" en desarrollo. Será implementada en la próxima versión. Usuario: ${displayName}`;
-        setToastMessage(msg);
-        setShowToast(true);
-        setTimeout(() => setShowToast(false), 3500);
-      }
-      // Si es 'help', simplemente volvemos al menú (overlay ya ocultado)
+      const displayName = user?.first_name || user?.username || 'amigo';
+      const msg = `Función "${optionType}" en desarrollo. Será implementada en la próxima versión. Usuario: ${displayName}`;
+      setToastMessage(msg);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3500);
     }, 4000);
   };
 
-  const menuOptions = getMenuOptionsForClientType();
+  const handleGoToChat = () => {
+    navigate('/chat');
+  };
 
-  // Removed loading screen condition to keep menu visible
+  const handleLogout = async () => {
+    try {
+      await logout();
+      chatService.clearCurrentSessionId();
+      navigate('/');
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
+  };
+
+  const handleChangePasswordSubmit = async (oldPassword, newPassword) => {
+    await changePassword(oldPassword, newPassword);
+    alert('Contraseña cambiada exitosamente');
+  };
 
   return (
     <div
@@ -205,22 +186,23 @@ const MainMenu = ({ userName, onGoToChat, onLogout, isDark, clientType, selected
     >
       {/* Theme Toggle - Pequeño y en la esquina superior derecha */}
       <div className="theme-toggle-container" style={themeToggleContainerStyle}>
-  <ThemeToggle onToggle={onToggleTheme} isDark={isDark} onLogout={onLogout} />
+        <ThemeToggle 
+          onToggle={() => setIsDark(!isDark)} 
+          isDark={isDark} 
+          onLogout={handleLogout}
+          onChangePassword={() => setShowChangePassword(true)}
+        />
       </div>
-      {/* Keep a fallback SettingsMenu instance (closed by default). ThemeToggle controls the visible one. */}
-      <SettingsMenu onLogout={onLogout} isDark={isDark} />
 
       {/* Botones de navegación */}
       <div className="nav-buttons-container" style={navButtonsContainerStyle}>
         <button 
           className="nav-button"
-          onClick={onGoToChat}
+          onClick={handleGoToChat}
           style={backButtonStyle}
         >
           ← Regresar al Chat
         </button>
-        
-        {/* Logout now available via SettingsMenu (gear) */}
       </div>
 
       {/* Contenedor de opciones */}
@@ -251,12 +233,14 @@ const MainMenu = ({ userName, onGoToChat, onLogout, isDark, clientType, selected
       <div className="bottom-indicator" style={bottomIndicatorStyle}>
         <div className="indicator-bar" style={indicatorBarStyle}></div>
       </div>
+      
       {/* Pantalla de carga overlay */}
       {isLoading && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 2000 }}>
-          <LoadingScreen isDark={isDark} loadingText={loadingText} onToggleTheme={onToggleTheme} />
+          <LoadingScreen isDark={isDark} loadingText={loadingText} onToggleTheme={() => setIsDark(!isDark)} />
         </div>
       )}
+      
       {/* Input oculto para subir fotos */}
       <input
         type="file"
@@ -338,12 +322,21 @@ const MainMenu = ({ userName, onGoToChat, onLogout, isDark, clientType, selected
           </button>
         </div>
       )}
+      
       {/* Toast no bloqueante */}
       {showToast && (
         <div style={toastStyle} role="status">
           {toastMessage}
         </div>
       )}
+
+      {/* Change Password Modal */}
+      <ChangePasswordModal
+        isOpen={showChangePassword}
+        onClose={() => setShowChangePassword(false)}
+        onSubmit={handleChangePasswordSubmit}
+        isDark={isDark}
+      />
     </div>
   );
 };
@@ -370,18 +363,6 @@ const backButtonStyle = {
   background: 'rgba(52, 152, 219, 0.2)',
   border: 'none',
   color: 'rgba(52, 152, 219, 1)',
-  padding: '8px 12px',
-  borderRadius: '15px',
-  fontSize: '14px',
-  cursor: 'pointer',
-  fontWeight: 'bold',
-  transition: 'all 0.3s ease'
-};
-
-const logoutButtonStyle = {
-  background: 'rgba(255,87,87,0.2)',
-  border: 'none',
-  color: 'rgba(255,87,87,1)',
   padding: '8px 12px',
   borderRadius: '15px',
   fontSize: '14px',
@@ -453,9 +434,6 @@ const indicatorBarStyle = {
   borderRadius: '3px'
 };
 
-export default MainMenu;
-
-// Toast styles
 const toastStyle = {
   position: 'fixed',
   top: '20px',
@@ -468,3 +446,5 @@ const toastStyle = {
   maxWidth: '320px',
   boxShadow: '0 6px 18px rgba(0,0,0,0.2)'
 };
+
+export default MainMenu;

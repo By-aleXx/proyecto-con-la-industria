@@ -1,34 +1,35 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import anime from 'animejs';
+import ReactMarkdown from 'react-markdown';
+import { useAuth } from '../context/AuthContext';
+import chatService from '../services/chatService';
 import ThemeToggle from './ThemeToggle';
+import ChangePasswordModal from './ChangePasswordModal';
 import '../estilos/index.css';
 
-const ChatRecommendations = ({ userName, clientType, selectedArea, selectedSearch, onLogout, onGoToMenu, isDark, onToggleTheme }) => {
+const ChatRecommendations = () => {
+  const { user, logout, changePassword } = useAuth();
+  const navigate = useNavigate();
+  
   const [messages, setMessages] = useState([
     {
       id: 1,
       type: 'ai',
-      text: `¡Hola! Mi nombre es Laura y estoy aquí para ayudarte. Con base a las especificaciones que estás buscando, puedo ofrecerte las mejores recomendaciones de pisos para tu proyecto.`,
+      text: `¡Hola ${user?.first_name || user?.username || ''}! Mi nombre es Laura y estoy aquí para ayudarte. ¿En qué puedo asistirte hoy?`,
       timestamp: new Date()
     }
   ]);
   
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [isDark, setIsDark] = useState(false);
+  const [sessionId, setSessionId] = useState(null);
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const fileInputRef = useRef(null);
-
-  const questionOptions = {
-    clientType: ['Particular', 'Empresa', 'Otro'],
-    area: ['Sala', 'Cocina', 'Baño', 'Recámara', 'Oficina'],
-    search: ['Laminado', 'Vinílico', 'Cerámico', 'Otro']
-  };
-
-  const [pendingQuestion, setPendingQuestion] = useState(null);
-  const [selectedAnswers, setSelectedAnswers] = useState([]);
-  const [questionQueue, setQuestionQueue] = useState([]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -46,27 +47,18 @@ const ChatRecommendations = ({ userName, clientType, selectedArea, selectedSearc
 
     // Auto scroll al final
     scrollToBottom();
-
-    // Escuchar preguntas post-login
-    const handlePostLoginQuestions = (e) => {
-      const questions = e.detail;
-      if (questions && questions.length > 0) {
-        setQuestionQueue(questions);
-        setPendingQuestion(questions[0]);
-        // Agregar la primera pregunta como mensaje
-        setMessages(prev => [...prev, {
-          id: Date.now(),
-          type: 'ai',
-          text: '¿Qué tipo de cliente eres?',  // Simplificamos el texto de la pregunta
-          questionId: questions[0].id,
-          timestamp: new Date()
-        }]);
-      }
-    };
-    window.addEventListener('postLoginQuestions', handlePostLoginQuestions);
-    return () => {
-      window.removeEventListener('postLoginQuestions', handlePostLoginQuestions);
-    };
+    
+    // Obtener o crear session_id
+    const currentSessionId = chatService.getCurrentSessionId();
+    if (currentSessionId) {
+      setSessionId(currentSessionId);
+      // Cargar historial de esta sesión si es necesario
+    } else {
+      // Crear nueva sesión
+      const newSessionId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
+      setSessionId(newSessionId);
+      chatService.setCurrentSessionId(newSessionId);
+    }
   }, []);
 
   useEffect(() => {
@@ -81,13 +73,9 @@ const ChatRecommendations = ({ userName, clientType, selectedArea, selectedSearc
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Create a FormData object to send the file
-    const formData = new FormData();
-    formData.append('image', file);
-
-    // Create a message with the uploaded image
+    // Crear preview de la imagen
     const reader = new FileReader();
-    reader.onloadend = async () => {
+    reader.onloadend = () => {
       const newMessage = {
         id: Date.now(),
         type: 'user',
@@ -97,141 +85,174 @@ const ChatRecommendations = ({ userName, clientType, selectedArea, selectedSearc
         timestamp: new Date()
       };
       setMessages(prev => [...prev, newMessage]);
-
-      try {
-        // Enviar la imagen al servidor para análisis de color
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 segundos timeout
-
-  const response = await fetch('http://localhost:4000/api/extract-colors', {
-          method: 'POST',
-          body: formData,
-          signal: controller.signal,
-        });
-
-        clearTimeout(timeoutId);
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => null);
-          throw new Error(errorData?.error || 'Error al procesar la imagen');
-        }
-
-        const colorData = await response.json();
-        
-        // Crear el mensaje de respuesta con el análisis de color
-        const analysisMessage = {
-          id: Date.now() + 1,
-          type: 'ai',
-          text: 'He analizado los colores dominantes en la imagen:',
-          contentType: 'color-analysis',
-          colors: colorData.colors,
-          percentages: colorData.percentages,
-          timestamp: new Date()
-        };
-        
-        setMessages(prev => [...prev, analysisMessage]);
-      } catch (error) {
-        console.error('Error:', error);
-        let errorText = 'Lo siento, hubo un error al analizar los colores de la imagen.';
-        
-        if (error.name === 'AbortError') {
-          errorText = 'La operación tomó demasiado tiempo. Por favor, intenta con una imagen más pequeña.';
-        } else if (error.message === 'NetworkError') {
-          errorText = 'No se pudo conectar con el servidor. Por favor, verifica tu conexión.';
-        }
-
-        const errorMessage = {
-          id: Date.now() + 1,
-          type: 'ai',
-          text: errorText,
-          timestamp: new Date()
-        };
-        setMessages(prev => [...prev, errorMessage]);
-      }
+      
+      // Por ahora solo mostramos la imagen, cuando el backend esté listo se procesará
+      const responseMessage = {
+        id: Date.now() + 1,
+        type: 'ai',
+        text: 'He recibido tu imagen. La funcionalidad de análisis de color estará disponible próximamente.',
+        timestamp: new Date()
+      };
+      setTimeout(() => {
+        setMessages(prev => [...prev, responseMessage]);
+      }, 500);
     };
     reader.readAsDataURL(file);
   };
 
-  const handleSendMessage = () => {
-    if (inputText.trim() !== '') {
-      const newMessage = {
-        id: Date.now(),
-        type: 'user',
-        text: inputText,
+  const handleSendMessage = async () => {
+    if (inputText.trim() === '') return;
+
+    const userMessage = {
+      id: Date.now(),
+      type: 'user',
+      text: inputText,
+      timestamp: new Date()
+    };
+    
+    setMessages(prev => [...prev, userMessage]);
+    setInputText('');
+    setIsTyping(true);
+
+    try {
+      // Preparar historial para enviar al backend
+      const historial = messages.map(msg => ({
+        role: msg.type === 'user' ? 'user' : 'assistant',
+        content: msg.text
+      }));
+      
+      // Agregar el mensaje actual
+      historial.push({
+        role: 'user',
+        content: inputText
+      });
+
+      // Enviar mensaje al backend
+      const response = await chatService.sendMessage(inputText, sessionId, historial);
+
+      // Agregar respuesta del asistente
+      const aiMessage = {
+        id: Date.now() + 1,
+        type: 'ai',
+        text: response.respuesta,
+        timestamp: new Date(),
+        metadata: response.metadata
+      };
+      
+      setMessages(prev => [...prev, aiMessage]);
+      
+      // Actualizar session_id si es necesario
+      if (response.session_id && response.session_id !== sessionId) {
+        setSessionId(response.session_id);
+        chatService.setCurrentSessionId(response.session_id);
+      }
+      
+    } catch (error) {
+      console.error('Error al enviar mensaje:', error);
+      
+      const errorMessage = {
+        id: Date.now() + 1,
+        type: 'ai',
+        text: 'Lo siento, hubo un error al procesar tu mensaje. Por favor, intenta de nuevo.',
         timestamp: new Date()
       };
-      setMessages(prev => [...prev, newMessage]);
-      setInputText('');
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsTyping(false);
     }
   };
 
-  const handleOptionClick = (option) => {
-    // Toggle selection
-    setSelectedAnswers(prev => {
-      if (prev.includes(option)) {
-        return prev.filter(a => a !== option);
-      }
-      return [...prev, option];
-    });
-  };
-
-  const handleAsk = () => {
-    // Handle selected answers
-    if (selectedAnswers.length > 0) {
-      // Add user's selection as a message
-      const userMessage = {
-        id: Date.now(),
-        type: 'user',
-        text: selectedAnswers.join(', '),
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, userMessage]);
-      
-      // Clear selections and move to next question
-      setSelectedAnswers([]);
-      
-      if (questionQueue.length > 1) {
-        const newQueue = questionQueue.slice(1);
-        setQuestionQueue(newQueue);
-        setPendingQuestion(newQueue[0]);
-        
-        // Add next question
-        const nextQuestion = {
-          id: Date.now() + 1,
-          type: 'ai',
-          text: '¿En qué área planeas instalarlo?',
-          questionId: newQueue[0].id,
-          timestamp: new Date()
-        };
-        setMessages(prev => [...prev, nextQuestion]);
-      } else {
-        // No more questions
-        setPendingQuestion(null);
-        setQuestionQueue([]);
-      }
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
     }
   };
 
-  const handleSuggestionClick = (action) => {
-    // Implement suggestion click handler
-    console.log('Suggestion clicked:', action);
+  const handleLogout = async () => {
+    try {
+      await logout();
+      chatService.clearCurrentSessionId();
+      navigate('/');
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
+  };
+
+  const handleGoToMenu = () => {
+    navigate('/menu');
+  };
+
+  const handleNewConversation = () => {
+    // Crear nueva conversación
+    const newSessionId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
+    setSessionId(newSessionId);
+    chatService.setCurrentSessionId(newSessionId);
+    
+    // Limpiar mensajes
+    setMessages([
+      {
+        id: Date.now(),
+        type: 'ai',
+        text: `¡Hola ${user?.first_name || user?.username || ''}! Iniciemos una nueva conversación. ¿En qué puedo ayudarte?`,
+        timestamp: new Date()
+      }
+    ]);
+  };
+
+  const handleChangePasswordSubmit = async (oldPassword, newPassword) => {
+    await changePassword(oldPassword, newPassword);
+    alert('Contraseña cambiada exitosamente');
   };
 
   return (
     <div className={`chat-main-container ${isDark ? 'dark' : 'light'}`}>
       {/* Theme Toggle */}
       <div className="theme-toggle-container">
-        <ThemeToggle onToggle={onToggleTheme} isDark={isDark} onLogout={onLogout} />
+        <ThemeToggle 
+          onToggle={() => setIsDark(!isDark)} 
+          isDark={isDark} 
+          onLogout={handleLogout}
+          onChangePassword={() => setShowChangePassword(true)}
+        />
       </div>
-  {/* SettingsMenu is provided by ThemeToggle (to avoid duplicate menus) */}
 
       {/* Navigation Buttons */}
       <div className="nav-buttons-container">
         <button 
-          onClick={onGoToMenu}
+          onClick={handleGoToMenu}
           className="menu-button"
+          style={{
+            background: 'rgba(52, 152, 219, 0.2)',
+            border: 'none',
+            color: 'rgba(52, 152, 219, 1)',
+            padding: '8px 12px',
+            borderRadius: '15px',
+            fontSize: '14px',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            transition: 'all 0.3s ease',
+            marginRight: '8px'
+          }}
         >
-          Ir al Menú
+          📋 Menú
+        </button>
+        <button 
+          onClick={handleNewConversation}
+          className="new-conversation-button"
+          style={{
+            background: 'rgba(46, 204, 113, 0.2)',
+            border: 'none',
+            color: 'rgba(39, 174, 96, 1)',
+            padding: '8px 12px',
+            borderRadius: '15px',
+            fontSize: '14px',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            transition: 'all 0.3s ease'
+          }}
+        >
+          ➕ Nueva conversación
         </button>
       </div>
 
@@ -255,102 +276,17 @@ const ChatRecommendations = ({ userName, clientType, selectedArea, selectedSearc
                     <div className="avatar-fallback" style={{display: 'none', backgroundColor: '#8B4A42'}}>L</div>
                   </div>
                   <div className="ai-message">
-                    {message.contentType === 'image' && (
-                      <img
-                        src={message.content}
-                        alt="Imagen enviada"
-                        style={{
-                          maxWidth: '100%',
-                          borderRadius: '10px',
-                          marginBottom: message.text ? '8px' : '0'
-                        }}
-                      />
-                    )}
-                    <div className="ai-text" style={{
-                      background: message.questionId ? '#0084ff' : '#fff',
-                      color: message.questionId ? '#fff' : '#222',
-                      padding: message.questionId ? '12px 20px' : '18px 22px',
+                    <div className="ai-text markdown-content" style={{
+                      background: '#fff',
+                      color: '#222',
+                      padding: '18px 22px',
                       borderRadius: '20px',
-                      fontSize: message.questionId ? '0.95rem' : '1.1rem',
-                      fontWeight: message.questionId ? '500' : '400',
-                      letterSpacing: message.questionId ? '0.3px' : 'normal',
-                      boxShadow: message.questionId ? '0 2px 12px rgba(0, 132, 255, 0.2)' : '0 2px 12px rgba(0,0,0,0.1)'
+                      fontSize: '1.1rem',
+                      fontWeight: '400',
+                      boxShadow: '0 2px 12px rgba(0,0,0,0.1)'
                     }}>
-                      {message.text}
-                      {message.contentType === 'color-analysis' && message.colors && (
-                        <div style={{ marginTop: '10px', maxWidth: '300px' }}>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '8px', justifyContent: 'center' }}>
-                            {message.colors.map((colorInfo, index) => (
-                              <div key={index} style={{ textAlign: 'center', flex: '0 0 calc(50% - 6px)' }}>
-                                <div style={{
-                                  width: '100%',
-                                  height: '60px',
-                                  backgroundColor: colorInfo[0],
-                                  borderRadius: '8px',
-                                  boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                                  marginBottom: '6px'
-                                }} />
-                                <div style={{ 
-                                  fontSize: '0.9rem',
-                                  backgroundColor: isDark ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.9)',
-                                  padding: '4px 8px',
-                                  borderRadius: '4px',
-                                  marginTop: '2px'
-                                }}>
-                                  <div style={{ fontWeight: 'bold' }}>{colorInfo[0]}</div>
-                                  <div>{message.percentages[index].toFixed(1)}%</div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                      <ReactMarkdown>{message.text}</ReactMarkdown>
                     </div>
-                    {message.questionId && pendingQuestion && message.questionId === pendingQuestion.id && questionOptions[pendingQuestion.id] && (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '4px', maxWidth: '340px' }}>
-                        {questionOptions[pendingQuestion.id].map(option => (
-                          <button
-                            key={option}
-                            onClick={() => handleOptionClick(option)}
-                            style={{
-                              background: selectedAnswers.includes(option) ? '#0084ff' : '#2c2c2c',
-                              color: '#fff',
-                              border: 'none',
-                              borderRadius: '20px',
-                              padding: '10px 0',
-                              fontWeight: '500',
-                              cursor: 'pointer',
-                              width: '100%',
-                              fontSize: '0.95rem',
-                              boxShadow: selectedAnswers.includes(option) ? '0 2px 8px rgba(0, 132, 255, 0.3)' : 'none',
-                              transition: 'all 0.2s ease'
-                            }}
-                          >
-                            {option}
-                          </button>
-                        ))}
-                        <button
-                          onClick={handleAsk}
-                          style={{
-                            background: '#40e6b4',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: '20px',
-                            padding: '8px 0',
-                            fontWeight: '500',
-                            marginTop: '4px',
-                            cursor: 'pointer',
-                            width: '100%',
-                            fontSize: '0.95rem',
-                            boxShadow: '0 2px 8px rgba(64, 230, 180, 0.3)',
-                            transition: 'all 0.2s ease'
-                          }}
-                          disabled={selectedAnswers.length === 0}
-                        >
-                          Enviar
-                        </button>
-                      </div>
-                    )}
                   </div>
                 </div>
               )}
@@ -383,100 +319,137 @@ const ChatRecommendations = ({ userName, clientType, selectedArea, selectedSearc
                     </div>
                   </div>
                   <div className="user-avatar-circle">
-                    U
+                    {user?.first_name?.[0] || user?.username?.[0] || 'U'}
                   </div>
                 </div>
               )}
-              
-              {message.type === 'suggestion' && (
-                <button
-                  className="suggestion-button"
-                  onClick={() => handleSuggestionClick(message.action)}
-                >
-                  {message.text}
-                </button>
-              )}
             </div>
           ))}
-          <div ref={messagesEndRef} />
-
-          {/* Input oculto para subir fotos */}
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            ref={fileInputRef}
-            style={{ display: 'none' }}
-          />
-
-          {/* Input Area */}
-          <div style={{ position: 'fixed', bottom: 0, left: 0, width: '100%', background: 'transparent', padding: '20px 0', zIndex: 100 }}>
-            <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              {/* Botón de cámara a la izquierda */}
-              <button
-                onClick={handleImageClick}
-                style={{
-                      background: 'transparent',
-                      color: isDark ? '#fff' : '#000',
-                      border: 'none',
-                      borderRadius: '50%',
-                      width: '100px',
-                      height: '100px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '48px',
-                      marginRight: '16px',
-                   alignSelf: 'center',
-                   lineHeight: 0,
-                  cursor: 'pointer',
-                  transform: 'translateY(-6px)',
-                  boxShadow: 'none'
-                }}
-                title="Subir o tomar foto"
-              >
-                    <span role="img" aria-label="camara" style={{ fontSize: 48 }}>📸</span>
-              </button>
-              <input
-                type="text"
-                value={inputText}
-                onChange={e => setInputText(e.target.value)}
-                placeholder="Escribe tu mensaje..."
-                style={{
-                  flex: 1,
-                  background: '#ffffff',
-                  color: '#000000',
-                  border: 'none',
-                  borderRadius: '20px',
-                  padding: '16px',
-                  fontSize: '1rem',
-                  outline: 'none'
-                }}
-              />
-              <button
-                onClick={handleSendMessage}
-                style={{
-                  background: '#43cea2',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '20px',
-                  padding: '12px 32px',
-                  fontSize: '1rem',
-                  cursor: 'pointer',
-                  fontWeight: 'bold',
-                  boxShadow: '0 2px 5px rgba(0,0,0,0.15)'
-                }}
-              >
-                Enviar
-              </button>
+          
+          {isTyping && (
+            <div className="message-ai">
+              <div className="ai-message-container">
+                <div className="avatar-circle">
+                  <div className="avatar-fallback" style={{backgroundColor: '#8B4A42'}}>L</div>
+                </div>
+                <div className="ai-message">
+                  <div className="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                </div>
+              </div>
             </div>
+          )}
+          
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Input oculto para subir fotos */}
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          ref={fileInputRef}
+          style={{ display: 'none' }}
+        />
+
+        {/* Input Area */}
+        <div style={{ 
+          position: 'fixed', 
+          bottom: 0, 
+          left: 0, 
+          width: '100%', 
+          background: 'transparent', 
+          padding: '20px 0', 
+          zIndex: 100 
+        }}>
+          <div style={{ 
+            maxWidth: '900px', 
+            margin: '0 auto', 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '10px',
+            padding: '0 20px'
+          }}>
+            {/* Botón de cámara a la izquierda */}
+            <button
+              onClick={handleImageClick}
+              style={{
+                background: 'transparent',
+                color: isDark ? '#fff' : '#000',
+                border: 'none',
+                borderRadius: '50%',
+                width: '100px',
+                height: '100px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '48px',
+                marginRight: '16px',
+                alignSelf: 'center',
+                lineHeight: 0,
+                cursor: 'pointer',
+                transform: 'translateY(-6px)',
+                boxShadow: 'none'
+              }}
+              title="Subir o tomar foto"
+            >
+              <span role="img" aria-label="camara" style={{ fontSize: 48 }}>📸</span>
+            </button>
+            <input
+              ref={inputRef}
+              type="text"
+              value={inputText}
+              onChange={e => setInputText(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Escribe tu mensaje..."
+              disabled={isTyping}
+              style={{
+                flex: 1,
+                background: '#ffffff',
+                color: '#000000',
+                border: 'none',
+                borderRadius: '20px',
+                padding: '16px',
+                fontSize: '1rem',
+                outline: 'none'
+              }}
+            />
+            <button
+              onClick={handleSendMessage}
+              disabled={isTyping || !inputText.trim()}
+              style={{
+                background: isTyping || !inputText.trim() ? '#95a5a6' : '#43cea2',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '20px',
+                padding: '12px 32px',
+                fontSize: '1rem',
+                cursor: isTyping || !inputText.trim() ? 'not-allowed' : 'pointer',
+                fontWeight: 'bold',
+                boxShadow: '0 2px 5px rgba(0,0,0,0.15)'
+              }}
+            >
+              Enviar
+            </button>
           </div>
         </div>
       </div>
+      
       {/* Bottom Indicator */}
       <div className="bottom-indicator">
         <div className="indicator-bar"></div>
       </div>
+
+      {/* Change Password Modal */}
+      <ChangePasswordModal
+        isOpen={showChangePassword}
+        onClose={() => setShowChangePassword(false)}
+        onSubmit={handleChangePasswordSubmit}
+        isDark={isDark}
+      />
     </div>
   );
 };

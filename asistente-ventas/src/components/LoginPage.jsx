@@ -1,64 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import anime from 'animejs';
+import { useAuth } from '../context/AuthContext';
 import ThemeToggle from './ThemeToggle';
-import MainMenu from './MainMenu';
-import ErrorScreen from './ErrorScreen';
-import ClientTypeSelection from './ClientTypeSelection';
-import AreaSelection from './AreaSelection';
-import SearchSelection from './SearchSelection';
-import LoadingRecommendations from './LoadingRecommendations';
-import ChatRecommendations from './ChatRecommendations';
 import '../estilos/index.css';
 import '../estilos/LoginPage.css';
-
-const initialForm = {
-  username: '',
-  password: '',
-  phone: '',
-  email: '',
-  birthdate: '',
-  branch: '',
-};
-
-const postLoginQuestions = [
-  {
-    id: 'clientType',
-    text: '¿Qué tipo de cliente eres? (Particular, Empresa, etc.)'
-  },
-  {
-    id: 'area',
-    text: '¿En qué área necesitas instalar el piso?'
-  },
-  {
-    id: 'search',
-    text: '¿Qué tipo de piso buscas? (Laminado, Vinílico, etc.)'
-  }
-];
 
 const LoginPage = () => {
   const [view, setView] = useState('welcome');
   const [isDark, setIsDark] = useState(false);
-  const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userName, setUserName] = useState('');
-  const [showError, setShowError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [clientType, setClientType] = useState(null);
-  const [showClientSelection, setShowClientSelection] = useState(false);
-  const [selectedArea, setSelectedArea] = useState(null);
-  const [showAreaSelection, setShowAreaSelection] = useState(false);
-  const [selectedSearch, setSelectedSearch] = useState(null);
-  const [showSearchSelection, setShowSearchSelection] = useState(false);
-  const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false);
-  const [showChat, setShowChat] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [isRegister, setIsRegister] = useState(false);
   const [message, setMessage] = useState('');
+  
+  // Estados para login
+  const [loginUsername, setLoginUsername] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  
+  // Estados para registro
+  const [registerUsername, setRegisterUsername] = useState('');
+  const [registerEmail, setRegisterEmail] = useState('');
+  const [registerPassword, setRegisterPassword] = useState('');
+  const [registerFirstName, setRegisterFirstName] = useState('');
+  const [registerLastName, setRegisterLastName] = useState('');
 
-  React.useEffect(() => {
+  const { login, register, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Si ya está autenticado, redirigir al chat
+    if (isAuthenticated) {
+      navigate('/chat');
+    }
+  }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
     anime({
       targets: '.fade-in',
       opacity: [0, 1],
@@ -69,214 +44,85 @@ const LoginPage = () => {
     });
   }, [view, isDark]);
 
-  const handleChange = e => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleLogin = async e => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     
-    if (!form.email || !form.password) {
-      setMessage('Por favor, proporciona un correo y una contraseña');
+    if (!loginUsername || !loginPassword) {
+      setMessage('Por favor, proporciona un usuario y una contraseña');
       return;
     }
 
     setLoading(true);
     setMessage('');
+    
     try {
-      console.log('Intentando conectar al servidor...');
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
-
-  const res = await fetch('http://localhost:4000/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: form.email, password: form.password }),
-        signal: controller.signal
-      });
-      const data = await res.json();
-      if (data.success) {
-        setMessage('¡Inicio de sesión exitoso!');
-        setLoading(false);
-        // El backend devuelve { success: true, user }
-        // El nombre está en data.user.name (según userModel)
-        setUserName(data.user?.name || form.email || '');
-        setIsLoggedIn(true);
-        setShowChat(true);
-        // Enviar preguntas al chat
-        setTimeout(() => {
-          window.dispatchEvent(new CustomEvent('postLoginQuestions', { detail: postLoginQuestions }));
-        }, 500);
-        setForm(initialForm);
-      } else {
-        setMessage(data.error || 'Credenciales incorrectas');
-        setLoading(false);
-      }
-    }
-    catch (err) {
-      setMessage('Error de conexión');
+      await login(loginUsername, loginPassword);
+      setMessage('¡Inicio de sesión exitoso!');
+      // El navigate se manejará automáticamente por el useEffect cuando cambie isAuthenticated
+    } catch (err) {
+      const errorMsg = err.response?.data?.detail || 'Error al iniciar sesión. Verifica tus credenciales.';
+      setMessage(errorMsg);
+    } finally {
       setLoading(false);
     }
   };
 
-  const handleRegister = async e => {
+  const handleRegister = async (e) => {
     e.preventDefault();
 
     // Validar campos requeridos
-    if (!form.username || !form.email || !form.password || !form.phone) {
+    if (!registerUsername || !registerEmail || !registerPassword) {
       setMessage('Por favor, completa todos los campos requeridos');
       return;
     }
 
     setLoading(true);
     setMessage('');
+    
     try {
-  const res = await fetch('http://localhost:4000/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
+      await register({
+        username: registerUsername,
+        email: registerEmail,
+        password: registerPassword,
+        first_name: registerFirstName,
+        last_name: registerLastName
       });
-      const data = await res.json();
-      if (data.success) {
-        setMessage('¡Registro exitoso! Ahora puedes iniciar sesión.');
-        setIsRegister(false);
-        setLoading(false);
-      } else {
-        setMessage(data.error || 'Error al registrar');
-        setLoading(false);
-      }
+      
+      setMessage('¡Registro exitoso! Ahora puedes iniciar sesión.');
+      
+      // Limpiar formulario y cambiar a vista de login
+      setRegisterUsername('');
+      setRegisterEmail('');
+      setRegisterPassword('');
+      setRegisterFirstName('');
+      setRegisterLastName('');
+      
+      setTimeout(() => {
+        setView('login');
+        setMessage('');
+      }, 2000);
+      
     } catch (err) {
-      setMessage('Error de conexión');
+      const errorData = err.response?.data;
+      let errorMsg = 'Error al registrar';
+      
+      if (errorData?.username) {
+        errorMsg = errorData.username[0];
+      } else if (errorData?.email) {
+        errorMsg = errorData.email[0];
+      } else if (errorData?.error) {
+        errorMsg = errorData.error;
+      }
+      
+      setMessage(errorMsg);
+    } finally {
       setLoading(false);
     }
-  };
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setUserName('');
-    setView('welcome');
-    setForm(initialForm);
-    setShowError(false);
-    setErrorMessage('');
-    setClientType(null);
-    setShowClientSelection(false);
-    setSelectedArea(null);
-    setShowAreaSelection(false);
-    setSelectedSearch(null);
-    setShowSearchSelection(false);
-    setIsLoadingRecommendations(false);
-    setShowChat(false);
-  };
-
-  const handleRetryFromError = () => {
-    setShowError(false);
-    setErrorMessage('');
-    setView('login');
-  };
-
-  // Funciones de navegación hacia atrás
-  const handleBackFromAreaSelection = () => {
-    setShowAreaSelection(false);
-    setShowClientSelection(true);
-    setSelectedArea(null);
-  };
-
-  const handleBackFromSearchSelection = () => {
-    setShowSearchSelection(false);
-    setShowAreaSelection(true);
-    setSelectedSearch(null);
-  };
-
-  const handleClientTypeSelected = (type) => {
-    setClientType(type);
-    setShowClientSelection(false);
-    setShowAreaSelection(true);
-  };
-
-  const handleAreaSelected = (area) => {
-    setSelectedArea(area);
-    setShowAreaSelection(false);
-    setShowSearchSelection(true);
-  };
-
-  const handleSearchSelected = (search) => {
-    setSelectedSearch(search);
-    setShowSearchSelection(false);
-    setIsLoadingRecommendations(true);
-    
-    // Simular carga de recomendaciones
-    setTimeout(() => {
-      setIsLoadingRecommendations(false);
-      setShowChat(true);
-    }, 3000); // 3 segundos de carga
-  };
-
-  const handleGoToMenu = () => {
-    setShowChat(false);
-    // Solo cambiamos showChat a false, manteniendo los valores actuales de clientType, selectedArea y selectedSearch
-  };
-
-  const handleGoToChat = () => {
-    setShowChat(true);
-    // Regresa al chat desde el menú principal y muestra las opciones
-    setTimeout(() => {
-      window.dispatchEvent(new CustomEvent('postLoginQuestions', { 
-        detail: [
-          {
-            id: 'clientType',
-            text: '¿Qué tipo de cliente eres?'
-          },
-          {
-            id: 'area',
-            text: '¿En qué área necesitas instalar el piso?'
-          },
-          {
-            id: 'search',
-            text: '¿Qué tipo de piso buscas?'
-          }
-        ]
-      }));
-    }, 500);
   };
 
   const bgGradient = isDark
     ? 'linear-gradient(135deg, #232526 0%, #414345 100%)'
     : 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)';
-
-  // Si el usuario está en el chat de recomendaciones
-  if (isLoggedIn && showChat) {
-    return <ChatRecommendations userName={userName} clientType={clientType} selectedArea={selectedArea} selectedSearch={selectedSearch} onLogout={handleLogout} onGoToMenu={handleGoToMenu} isDark={isDark} onToggleTheme={() => setIsDark(!isDark)} />;
-  }
-
-  // Si está cargando recomendaciones
-  if (isLoggedIn && isLoadingRecommendations) {
-    return <LoadingRecommendations isDark={isDark} onToggleTheme={() => setIsDark(!isDark)} onLogout={handleLogout} />;
-  }
-
-  // Si el usuario está logueado y no está en el chat, mostrar el menú principal
-  if (isLoggedIn && !showChat && !isLoadingRecommendations) {
-    return <MainMenu userName={userName} onGoToChat={handleGoToChat} onLogout={handleLogout} isDark={isDark} clientType={clientType} selectedArea={selectedArea} selectedSearch={selectedSearch} onToggleTheme={() => setIsDark(!isDark)} />;
-  }
-
-  // Si el usuario está logueado, ha seleccionado tipo de cliente y área pero no búsqueda, mostrar selección de búsqueda
-  if (isLoggedIn && clientType && selectedArea && showSearchSelection) {
-    return <SearchSelection userName={userName} clientType={clientType} selectedArea={selectedArea} onSearchSelected={handleSearchSelected} isDark={isDark} onToggleTheme={() => setIsDark(!isDark)} onBack={handleBackFromSearchSelection} onLogout={handleLogout} />;
-  }
-
-  // Si el usuario está logueado, ha seleccionado tipo de cliente pero no área, mostrar selección de área
-  if (isLoggedIn && clientType && showAreaSelection) {
-    return <AreaSelection userName={userName} clientType={clientType} onAreaSelected={handleAreaSelected} isDark={isDark} onToggleTheme={() => setIsDark(!isDark)} onBack={handleBackFromAreaSelection} onLogout={handleLogout} />;
-  }
-
-  // Si el usuario está logueado pero no ha seleccionado tipo de cliente, mostrar selección
-  if (isLoggedIn && showClientSelection) {
-    return <ClientTypeSelection userName={userName} onClientTypeSelected={handleClientTypeSelected} isDark={isDark} onToggleTheme={() => setIsDark(!isDark)} onLogout={handleLogout} />;
-  }
-
-  // Si hay un error, mostrar la pantalla de error
-  if (showError) {
-    return <ErrorScreen errorMessage={errorMessage} onRetry={handleRetryFromError} isDark={isDark} onToggleTheme={() => setIsDark(!isDark)} onLogout={handleLogout} />;
-  }
 
   return (
     <div
@@ -324,11 +170,11 @@ const LoginPage = () => {
           </h2>
           <div className="form-group">
             <input 
-              name="email" 
-              type="email" 
-              placeholder="Correo Electrónico" 
-              value={form.email} 
-              onChange={handleChange} 
+              name="username" 
+              type="text" 
+              placeholder="Usuario" 
+              value={loginUsername} 
+              onChange={(e) => setLoginUsername(e.target.value)} 
               className="form-input"
               required 
             />
@@ -338,23 +184,27 @@ const LoginPage = () => {
               name="password" 
               type="password" 
               placeholder="Ingresar Contraseña" 
-              value={form.password} 
-              onChange={handleChange} 
+              value={loginPassword} 
+              onChange={(e) => setLoginPassword(e.target.value)} 
               className="form-input"
               required 
             />
           </div>
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '18px' }}>
-            <button type="button" className="olvidar-btn">
-              OLVIDE LA CONTRASEÑA
-            </button>
-          </div>
           <div className="form-actions">
-            <button type="submit" className="primary-button">
+            <button type="submit" className="primary-button" disabled={loading}>
               {loading ? 'Iniciando Sesión...' : 'Iniciar Sesión'}
             </button>
           </div>
-          {message && <div style={{ textAlign: 'center', marginTop: '16px', color: '#9d7be7', fontWeight: 'bold' }}>{message}</div>}
+          {message && (
+            <div style={{ 
+              textAlign: 'center', 
+              marginTop: '16px', 
+              color: message.includes('exitoso') ? '#27ae60' : '#e74c3c', 
+              fontWeight: 'bold' 
+            }}>
+              {message}
+            </div>
+          )}
         </form>
       )}
       
@@ -369,19 +219,9 @@ const LoginPage = () => {
           <div className="form-group">
             <input 
               name="username" 
-              placeholder="Ingresar Usuario" 
-              value={form.username} 
-              onChange={handleChange} 
-              className="form-input"
-              required 
-            />
-          </div>
-          <div className="form-group">
-            <input 
-              name="phone" 
-              placeholder="Teléfono/WhatsApp" 
-              value={form.phone} 
-              onChange={handleChange} 
+              placeholder="Usuario *" 
+              value={registerUsername} 
+              onChange={(e) => setRegisterUsername(e.target.value)} 
               className="form-input"
               required 
             />
@@ -390,30 +230,9 @@ const LoginPage = () => {
             <input 
               name="email" 
               type="email" 
-              placeholder="Correo Electrónico" 
-              value={form.email} 
-              onChange={handleChange} 
-              className="form-input"
-              required 
-            />
-          </div>
-          <div className="form-group">
-            <input 
-              name="birthdate" 
-              type="date" 
-              placeholder="Fecha de nacimiento" 
-              value={form.birthdate} 
-              onChange={handleChange} 
-              className="form-input"
-              required 
-            />
-          </div>
-          <div className="form-group">
-            <input 
-              name="branch" 
-              placeholder="Sucursal actual" 
-              value={form.branch} 
-              onChange={handleChange} 
+              placeholder="Correo Electrónico *" 
+              value={registerEmail} 
+              onChange={(e) => setRegisterEmail(e.target.value)} 
               className="form-input"
               required 
             />
@@ -422,19 +241,46 @@ const LoginPage = () => {
             <input 
               name="password" 
               type="password" 
-              placeholder="Contraseña" 
-              value={form.password} 
-              onChange={handleChange} 
+              placeholder="Contraseña *" 
+              value={registerPassword} 
+              onChange={(e) => setRegisterPassword(e.target.value)} 
               className="form-input"
               required 
             />
           </div>
+          <div className="form-group">
+            <input 
+              name="first_name" 
+              placeholder="Nombre" 
+              value={registerFirstName} 
+              onChange={(e) => setRegisterFirstName(e.target.value)} 
+              className="form-input"
+            />
+          </div>
+          <div className="form-group">
+            <input 
+              name="last_name" 
+              placeholder="Apellido" 
+              value={registerLastName} 
+              onChange={(e) => setRegisterLastName(e.target.value)} 
+              className="form-input"
+            />
+          </div>
           <div className="form-actions">
-            <button type="submit" className="secondary-button">
+            <button type="submit" className="secondary-button" disabled={loading}>
               {loading ? 'Registrando...' : 'Registrar'}
             </button>
           </div>
-          {message && <div style={{ textAlign: 'center', marginTop: '16px', color: '#9d7be7', fontWeight: 'bold' }}>{message}</div>}
+          {message && (
+            <div style={{ 
+              textAlign: 'center', 
+              marginTop: '16px', 
+              color: message.includes('exitoso') ? '#27ae60' : '#e74c3c', 
+              fontWeight: 'bold' 
+            }}>
+              {message}
+            </div>
+          )}
         </form>
       )}
     </div>

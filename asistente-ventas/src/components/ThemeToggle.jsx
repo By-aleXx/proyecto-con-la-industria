@@ -4,7 +4,7 @@ import solPng from '../assets/sol.png';
 import gearPng from '../assets/gear.png';
 import SettingsMenu from './SettingsMenu';
 
-const ThemeToggle = ({ onToggle, isDark, onLogout, showGear = true }) => {
+const ThemeToggle = ({ onToggle, isDark, onLogout, onChangePassword, showGear = true }) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   // If the gear is hidden, we don't render the menu trigger or SettingsMenu
@@ -62,6 +62,12 @@ const ThemeToggle = ({ onToggle, isDark, onLogout, showGear = true }) => {
             setMenuOpen(false);
             // call parent's logout handler if provided
             if (typeof onLogout === 'function') onLogout();
+          }}
+          onChangePassword={() => {
+            // close the menu first
+            setMenuOpen(false);
+            // call parent's change password handler if provided
+            if (typeof onChangePassword === 'function') onChangePassword();
           }}
           open={menuOpen}
           setOpen={setMenuOpen}
