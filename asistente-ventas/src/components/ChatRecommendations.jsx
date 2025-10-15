@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import chatService from '../services/chatService';
 import ThemeToggle from './ThemeToggle';
 import ChangePasswordModal from './ChangePasswordModal';
+import ColorPickerModal from './ColorPickerModal';
 import '../estilos/index.css';
 
 const ChatRecommendations = () => {
@@ -26,6 +27,8 @@ const ChatRecommendations = () => {
   const [isDark, setIsDark] = useState(false);
   const [sessionId, setSessionId] = useState(null);
   const [showChangePassword, setShowChangePassword] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [showColorPicker, setShowColorPicker] = useState(false);
   
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -66,38 +69,98 @@ const ChatRecommendations = () => {
   }, [messages]);
 
   const handleImageClick = () => {
-    fileInputRef.current?.click();
+    // Verificar si el dispositivo tiene cámara
+    if ('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices) {
+      // Si tiene cámara, mostrar opciones
+      const useCamera = window.confirm('¿Deseas tomar una foto con la cámara? Presiona Cancelar para subir una foto de tu galería.');
+      if (useCamera) {
+        // Abrir la cámara
+        navigator.mediaDevices.getUserMedia({ video: true })
+          .then(stream => {
+            // Crear elemento de video temporal
+            const video = document.createElement('video');
+            video.srcObject = stream;
+            video.autoplay = true;
+            
+            // Esperar a que el video esté listo
+            video.onloadedmetadata = () => {
+              video.play();
+              
+              // Esperar un momento para que la cámara se estabilice
+              setTimeout(() => {
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0);
+                
+                // Detener el stream
+                stream.getTracks().forEach(track => track.stop());
+                
+                // Obtener la imagen
+                const imageDataUrl = canvas.toDataURL('image/jpeg');
+                setSelectedImage(imageDataUrl);
+                setShowColorPicker(true);
+              }, 500);
+            };
+          })
+          .catch(err => {
+            console.error('Error accessing camera:', err);
+            alert('No se pudo acceder a la cámara. Usando selector de archivos.');
+            fileInputRef.current?.click();
+          });
+      } else {
+        fileInputRef.current?.click();
+      }
+    } else {
+      // Si no tiene cámara, abrir directamente el selector de archivos
+      fileInputRef.current?.click();
+    }
   };
 
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Crear preview de la imagen
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const newMessage = {
-        id: Date.now(),
-        type: 'user',
-        text: '',
-        contentType: 'image',
-        content: reader.result,
-        timestamp: new Date()
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setSelectedImage(e.target.result);
+        setShowColorPicker(true);
       };
-      setMessages(prev => [...prev, newMessage]);
-      
-      // Por ahora solo mostramos la imagen, cuando el backend esté listo se procesará
-      const responseMessage = {
-        id: Date.now() + 1,
-        type: 'ai',
-        text: 'He recibido tu imagen. La funcionalidad de análisis de color estará disponible próximamente.',
-        timestamp: new Date()
-      };
-      setTimeout(() => {
-        setMessages(prev => [...prev, responseMessage]);
-      }, 500);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleColorConfirmed = (color) => {
+    setShowColorPicker(false);
+    
+    // Agregar la imagen al chat como mensaje del usuario
+    const imageMessage = {
+      id: Date.now(),
+      type: 'user',
+      text: `Color seleccionado: ${color.hex}`,
+      contentType: 'image',
+      content: selectedImage,
+      color: color,
+      timestamp: new Date()
     };
-    reader.readAsDataURL(file);
+    setMessages(prev => [...prev, imageMessage]);
+    
+    // Respuesta de la IA
+    const responseMessage = {
+      id: Date.now() + 1,
+      type: 'ai',
+      text: `Perfecto, he detectado el color **${color.hex}** (RGB: ${color.rgb}). Ahora buscaré pisos que coincidan con este color. Esta funcionalidad estará disponible cuando el backend esté implementado.`,
+      timestamp: new Date()
+    };
+    
+    setTimeout(() => {
+      setMessages(prev => [...prev, responseMessage]);
+    }, 500);
+    
+    // Aquí puedes agregar lógica adicional para buscar productos
+    console.log('Color seleccionado para búsqueda:', color);
   };
 
   const handleSendMessage = async () => {
@@ -449,6 +512,18 @@ const ChatRecommendations = () => {
         onClose={() => setShowChangePassword(false)}
         onSubmit={handleChangePasswordSubmit}
         isDark={isDark}
+      />
+
+      {/* Color Picker Modal */}
+      <ColorPickerModal
+        isOpen={showColorPicker}
+        onClose={() => {
+          setShowColorPicker(false);
+          setSelectedImage(null);
+        }}
+        imageUrl={selectedImage}
+        isDark={isDark}
+        onColorConfirmed={handleColorConfirmed}
       />
     </div>
   );
