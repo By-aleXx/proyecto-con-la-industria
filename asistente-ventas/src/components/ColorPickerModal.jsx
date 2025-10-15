@@ -107,8 +107,11 @@ const ColorPickerModal = ({ isOpen, onClose, imageUrl, isDark, onColorConfirmed 
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    // Ajustar coordenadas según el zoom
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
 
     // Verificar si está dentro del canvas
     if (x >= 0 && x <= canvas.width && y >= 0 && y <= canvas.height) {
@@ -125,8 +128,11 @@ const ColorPickerModal = ({ isOpen, onClose, imageUrl, isDark, onColorConfirmed 
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    let x = e.clientX - rect.left;
-    let y = e.clientY - rect.top;
+    // Ajustar coordenadas según el zoom
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    let x = (e.clientX - rect.left) * scaleX;
+    let y = (e.clientY - rect.top) * scaleY;
 
     // Limitar el movimiento dentro del canvas
     x = Math.max(0, Math.min(x, canvas.width));
@@ -147,8 +153,11 @@ const ColorPickerModal = ({ isOpen, onClose, imageUrl, isDark, onColorConfirmed 
 
     const rect = canvas.getBoundingClientRect();
     const touch = e.touches[0];
-    const x = touch.clientX - rect.left;
-    const y = touch.clientY - rect.top;
+    // Ajustar coordenadas según el zoom
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (touch.clientX - rect.left) * scaleX;
+    const y = (touch.clientY - rect.top) * scaleY;
 
     if (x >= 0 && x <= canvas.width && y >= 0 && y <= canvas.height) {
       setIsDragging(true);
@@ -166,8 +175,11 @@ const ColorPickerModal = ({ isOpen, onClose, imageUrl, isDark, onColorConfirmed 
 
     const rect = canvas.getBoundingClientRect();
     const touch = e.touches[0];
-    let x = touch.clientX - rect.left;
-    let y = touch.clientY - rect.top;
+    // Ajustar coordenadas según el zoom
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    let x = (touch.clientX - rect.left) * scaleX;
+    let y = (touch.clientY - rect.top) * scaleY;
 
     x = Math.max(0, Math.min(x, canvas.width));
     y = Math.max(0, Math.min(y, canvas.height));
