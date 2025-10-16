@@ -40,6 +40,15 @@
   overflow: hidden;
 }
 
+/* Cuerpo desplazable dentro del modal */
+.modal-body {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-right: 4px; /* evita salto al aparecer la barra */
+  flex: 1;
+  min-height: 0; /* permite que el hijo con overflow funcione dentro de flex */
+}
+
 @keyframes slideUp {
   from {
     transform: translateY(30px);
@@ -306,6 +315,11 @@
   gap: 10px;
   justify-content: flex-end;
   padding-top: 10px;
+  position: sticky;
+  bottom: 0;
+  background: inherit;
+  padding-bottom: calc(10px + env(safe-area-inset-bottom));
+  z-index: 1;
 }
 
 .action-buttons button {

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import '../estilos/ColorPickerModal.css';
 
 const ColorPickerModal = ({ isOpen, onClose, imageUrl, isDark, onColorConfirmed }) => {
@@ -7,39 +7,13 @@ const ColorPickerModal = ({ isOpen, onClose, imageUrl, isDark, onColorConfirmed 
   const containerRef = useRef(null);
   
   const [selectedColor, setSelectedColor] = useState(null);
-  const [pickerPosition, setPickerPosition] = useState({ x: 50, y: 50 });
   const [isDragging, setIsDragging] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [canvasDimensions, setCanvasDimensions] = useState({ width: 0, height: 0 });
   const [zoomLevel, setZoomLevel] = useState(1);
 
-  useEffect(() => {
-    if (isOpen && imageUrl) {
-      loadImage();
-    }
-  }, [isOpen, imageUrl]);
+  
 
-  const loadImage = () => {
-    const img = new Image();
-    img.onload = () => {
-      imageRef.current = img;
-      drawImageOnCanvas();
-      setImageLoaded(true);
-      
-      // Posicionar el cuentagotas en el centro al inicio
-      const canvas = canvasRef.current;
-      if (canvas) {
-        setPickerPosition({
-          x: canvas.width / 2,
-          y: canvas.height / 2
-        });
-        updateColorAtPosition(canvas.width / 2, canvas.height / 2);
-      }
-    };
-    img.src = imageUrl;
-  };
-
-  const drawImageOnCanvas = () => {
+  const drawImageOnCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !imageRef.current || !container) return;
@@ -67,13 +41,11 @@ const ColorPickerModal = ({ isOpen, onClose, imageUrl, isDark, onColorConfirmed 
     canvas.width = drawWidth;
     canvas.height = drawHeight;
     
-    setCanvasDimensions({ width: drawWidth, height: drawHeight });
-    
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-  };
+  }, []);
 
-  const getColorAtPosition = (x, y) => {
+  const getColorAtPosition = useCallback((x, y) => {
     const canvas = canvasRef.current;
     if (!canvas) return null;
 
@@ -86,7 +58,7 @@ const ColorPickerModal = ({ isOpen, onClose, imageUrl, isDark, onColorConfirmed 
       hex: rgbToHex(r, g, b),
       r, g, b, a
     };
-  };
+  }, []);
 
   const rgbToHex = (r, g, b) => {
     return '#' + [r, g, b].map(x => {
@@ -95,12 +67,28 @@ const ColorPickerModal = ({ isOpen, onClose, imageUrl, isDark, onColorConfirmed 
     }).join('');
   };
 
-  const updateColorAtPosition = (x, y) => {
+  const updateColorAtPosition = useCallback((x, y) => {
     const color = getColorAtPosition(Math.round(x), Math.round(y));
     if (color) {
       setSelectedColor(color);
     }
-  };
+  }, [getColorAtPosition]);
+
+  // Cargar imagen cuando se abre
+  useEffect(() => {
+    if (!(isOpen && imageUrl)) return;
+    const img = new Image();
+    img.onload = () => {
+      imageRef.current = img;
+      drawImageOnCanvas();
+      setImageLoaded(true);
+      const canvas = canvasRef.current;
+      if (canvas) {
+        updateColorAtPosition(canvas.width / 2, canvas.height / 2);
+      }
+    };
+    img.src = imageUrl;
+  }, [isOpen, imageUrl, drawImageOnCanvas, updateColorAtPosition]);
 
   const handleMouseDown = (e) => {
     const canvas = canvasRef.current;
@@ -116,7 +104,6 @@ const ColorPickerModal = ({ isOpen, onClose, imageUrl, isDark, onColorConfirmed 
     // Verificar si está dentro del canvas
     if (x >= 0 && x <= canvas.width && y >= 0 && y <= canvas.height) {
       setIsDragging(true);
-      setPickerPosition({ x, y });
       updateColorAtPosition(x, y);
     }
   };
@@ -138,7 +125,6 @@ const ColorPickerModal = ({ isOpen, onClose, imageUrl, isDark, onColorConfirmed 
     x = Math.max(0, Math.min(x, canvas.width));
     y = Math.max(0, Math.min(y, canvas.height));
 
-    setPickerPosition({ x, y });
     updateColorAtPosition(x, y);
   };
 
@@ -161,7 +147,6 @@ const ColorPickerModal = ({ isOpen, onClose, imageUrl, isDark, onColorConfirmed 
 
     if (x >= 0 && x <= canvas.width && y >= 0 && y <= canvas.height) {
       setIsDragging(true);
-      setPickerPosition({ x, y });
       updateColorAtPosition(x, y);
     }
   };
@@ -184,7 +169,6 @@ const ColorPickerModal = ({ isOpen, onClose, imageUrl, isDark, onColorConfirmed 
     x = Math.max(0, Math.min(x, canvas.width));
     y = Math.max(0, Math.min(y, canvas.height));
 
-    setPickerPosition({ x, y });
     updateColorAtPosition(x, y);
   };
 
@@ -202,7 +186,6 @@ const ColorPickerModal = ({ isOpen, onClose, imageUrl, isDark, onColorConfirmed 
   const handleClose = () => {
     setSelectedColor(null);
     setImageLoaded(false);
-    setPickerPosition({ x: 50, y: 50 });
     setZoomLevel(1);
     onClose();
   };
@@ -219,7 +202,7 @@ const ColorPickerModal = ({ isOpen, onClose, imageUrl, isDark, onColorConfirmed 
     if (imageLoaded) {
       drawImageOnCanvas();
     }
-  }, [zoomLevel]);
+  }, [zoomLevel, imageLoaded, drawImageOnCanvas]);
 
   if (!isOpen) return null;
 
@@ -232,8 +215,10 @@ const ColorPickerModal = ({ isOpen, onClose, imageUrl, isDark, onColorConfirmed 
           <button className="close-button" onClick={handleClose}>✕</button>
         </div>
 
-        {/* Canvas Container */}
-        <div className="canvas-container">
+        {/* Body scrollable */}
+        <div className="modal-body">
+          {/* Canvas Container */}
+          <div className="canvas-container">
           {!imageLoaded && (
             <div className="loading-message">Cargando imagen...</div>
           )}
@@ -253,46 +238,47 @@ const ColorPickerModal = ({ isOpen, onClose, imageUrl, isDark, onColorConfirmed 
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
           />
-        </div>
+          </div>
 
-        {/* Zoom Controls */}
-        <div className="zoom-controls">
-          <button onClick={handleZoomOut} disabled={zoomLevel <= 0.5}>
-            🔍−
-          </button>
-          <span className="zoom-level">{Math.round(zoomLevel * 100)}%</span>
-          <button onClick={handleZoomIn} disabled={zoomLevel >= 3}>
-            🔍+
-          </button>
-        </div>
+          {/* Zoom Controls */}
+          <div className="zoom-controls">
+            <button onClick={handleZoomOut} disabled={zoomLevel <= 0.5}>
+              🔍−
+            </button>
+            <span className="zoom-level">{Math.round(zoomLevel * 100)}%</span>
+            <button onClick={handleZoomIn} disabled={zoomLevel >= 3}>
+              🔍+
+            </button>
+          </div>
 
-        {/* Color Preview */}
-        {selectedColor && (
-          <div className="color-preview-section">
-            <div className="color-info">
-              <div className="color-label">Color seleccionado:</div>
-              <div className="color-details">
-                <div
-                  className="color-swatch"
-                  style={{ backgroundColor: selectedColor.hex }}
-                ></div>
-                <div className="color-values">
-                  <div className="color-value">
-                    <strong>HEX:</strong> {selectedColor.hex}
-                  </div>
-                  <div className="color-value">
-                    <strong>RGB:</strong> {selectedColor.rgb}
+          {/* Color Preview */}
+          {selectedColor && (
+            <div className="color-preview-section">
+              <div className="color-info">
+                <div className="color-label">Color seleccionado:</div>
+                <div className="color-details">
+                  <div
+                    className="color-swatch"
+                    style={{ backgroundColor: selectedColor.hex }}
+                  ></div>
+                  <div className="color-values">
+                    <div className="color-value">
+                      <strong>HEX:</strong> {selectedColor.hex}
+                    </div>
+                    <div className="color-value">
+                      <strong>RGB:</strong> {selectedColor.rgb}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Instructions */}
-        <div className="instructions">
-          <p>📱 Haz clic o arrastra sobre la imagen para seleccionar un color</p>
-          <p>🔍 Usa los botones de zoom para ver detalles</p>
+          {/* Instructions */}
+          <div className="instructions">
+            <p>📱 Haz clic o arrastra sobre la imagen para seleccionar un color</p>
+            <p>🔍 Usa los botones de zoom para ver detalles</p>
+          </div>
         </div>
 
         {/* Action Buttons */}
