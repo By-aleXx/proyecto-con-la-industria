@@ -491,14 +491,12 @@ const ChatRecommendations = () => {
             {/* Botón de cámara a la izquierda */}
             <button
               onClick={handleImageClick}
+              className="chat-camera-button"
               style={{
                 background: '#3498db',
                 color: '#fff',
                 border: 'none',
                 borderRadius: '50%',
-                padding: '12px',
-                width: '48px',
-                height: '48px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -552,14 +550,12 @@ const ChatRecommendations = () => {
             <button
               onClick={handleSendMessage}
               disabled={isTyping || !inputText.trim()}
+              className="chat-send-button"
               style={{
                 background: isTyping || !inputText.trim() ? '#95a5a6' : '#43cea2',
                 color: '#fff',
                 border: 'none',
                 borderRadius: '50%',
-                padding: '12px',
-                width: '48px',
-                height: '48px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',

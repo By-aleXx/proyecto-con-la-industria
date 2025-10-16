@@ -106,6 +106,22 @@
   line-height: 1;
 }
 
+/* Botones de cámara y enviar en la barra de entrada */
+.chat-camera-button,
+.chat-send-button {
+  width: 48px;
+  height: 48px;
+  padding: 12px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  appearance: none;
+  line-height: 1;
+}
+
 /* Botón del menú */
 .menu-button {
   background: rgba(52, 152, 219, 0.2);
@@ -275,12 +291,12 @@
 }
 
 .user-message {
-  background: linear-gradient(135deg, #007bff, #0056b3);
-  color: white;
-  border-radius: 18px 18px 5px 18px;
-  padding: 12px 16px;
+  background: #fff;
+  color: #222;
+  border-radius: 20px;
+  padding: 18px 22px;
   max-width: 75%;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
   margin: 3px 0;
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -295,7 +311,8 @@
 
 .user-text {
   line-height: 1.4;
-  font-size: 15px;
+  font-size: 1.1rem;
+  font-weight: 400;
 }
 
 /* Botón de sugerencia */
@@ -477,8 +494,19 @@
 
   /* Escalar ambos botones de acción por igual */
   .new-conversation-button,
-  .settings-button {
+  .settings-button,
+  .chat-camera-button,
+  .chat-send-button {
     transform: scale(0.85);
+  }
+
+  /* Reducir tamaño real de cámara/enviar para ganar espacio en el input */
+  .chat-camera-button,
+  .chat-send-button {
+    width: 40px;
+    height: 40px;
+    padding: 10px;
+    transform: none; /* evitar doble reducción visual */
   }
 
   .menu-button,
@@ -622,8 +650,19 @@
 
   /* Escalar ambos botones de acción por igual */
   .new-conversation-button,
-  .settings-button {
+  .settings-button,
+  .chat-camera-button,
+  .chat-send-button {
     transform: scale(0.75);
+  }
+
+  /* Aún más compacto en móviles chicos */
+  .chat-camera-button,
+  .chat-send-button {
+    width: 36px;
+    height: 36px;
+    padding: 8px;
+    transform: none;
   }
 
   .menu-button,
@@ -763,8 +802,19 @@
 
   /* Escalar ambos botones de acción por igual */
   .new-conversation-button,
-  .settings-button {
+  .settings-button,
+  .chat-camera-button,
+  .chat-send-button {
     transform: scale(0.7);
+  }
+
+  /* Ultra compacto para pantallas muy pequeñas */
+  .chat-camera-button,
+  .chat-send-button {
+    width: 32px;
+    height: 32px;
+    padding: 6px;
+    transform: none;
   }
 
   .menu-button,
@@ -947,10 +997,11 @@
     font-size: 16px;
   }
 
-  /* Mejorar contraste en móviles */
+  /* Mantener el mismo formato que el chatbot también en táctiles */
   .user-message {
-    background: linear-gradient(135deg, #007bff, #0056b3);
-    box-shadow: 0 3px 10px rgba(0,123,255,0.3);
+    background: #fff;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    color: #222;
   }
 }
 
