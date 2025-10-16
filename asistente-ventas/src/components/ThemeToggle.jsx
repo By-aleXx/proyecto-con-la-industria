@@ -9,6 +9,7 @@ const ThemeToggle = ({ onToggle, isDark, onLogout, onChangePassword, showGear = 
     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
       {showGear && (
         <button 
+          className="settings-button"
           onClick={() => setMenuOpen(!menuOpen)} 
           aria-label="Abrir configuración" 
           style={{ 

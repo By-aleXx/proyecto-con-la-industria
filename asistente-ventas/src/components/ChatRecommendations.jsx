@@ -481,12 +481,12 @@ const ChatRecommendations = () => {
           zIndex: 100 
         }}>
           <div style={{ 
-            maxWidth: '900px', 
+            maxWidth: window.innerWidth >= 1400 ? '1400px' : '1200px', 
             margin: '0 auto', 
             display: 'flex', 
             alignItems: 'center', 
             gap: '12px',
-            padding: '0 20px'
+            padding: window.innerWidth >= 1400 ? '0 40px' : '0 20px'
           }}>
             {/* Botón de cámara a la izquierda */}
             <button

@@ -37,6 +37,9 @@
   animation: gradientShift 12s ease-in-out infinite;
   position: relative;
   overflow: hidden;
+  /* Variables para alinear acciones con el ancho/padding del chat */
+  --chat-max: 1200px;
+  --chat-padding: 20px;
 }
 
 /* Modo claro */
@@ -57,7 +60,7 @@
 .theme-toggle-container {
   position: absolute;
   top: 25px;
-  right: 15px;
+  right: calc((100vw - min(var(--chat-max), 100vw)) / 2 + var(--chat-padding));
   z-index: 2000;
   transform: scale(1.0);
 }
@@ -66,10 +69,41 @@
 .nav-buttons-container {
   position: absolute;
   top: 25px;
-  left: 15px;
+  left: calc((100vw - min(var(--chat-max), 100vw)) / 2 + var(--chat-padding));
   display: flex;
   gap: 10px;
   z-index: 2000;
+}
+
+/* Botón Nueva conversación - mismo tamaño que Configuración */
+.new-conversation-button {
+  width: 48px;
+  height: 48px;
+  padding: 12px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  appearance: none;
+  line-height: 1;
+}
+
+/* Asegurar mismas bases para ambos botones de acción */
+.new-conversation-button,
+.settings-button {
+  width: 48px;
+  height: 48px;
+  padding: 12px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  appearance: none;
+  line-height: 1;
 }
 
 /* Botón del menú */
@@ -113,10 +147,10 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  max-width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
   width: 100%;
-  padding: 110px 10px 10px 10px;
+  padding: 110px 20px 10px 20px;
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -163,7 +197,7 @@
   align-items: flex-start;
   gap: 12px;
   margin-bottom: 25px;
-  max-width: 85%;
+  max-width: 75%;
   padding-left: 5px;
 }
 
@@ -173,10 +207,10 @@
   align-items: flex-end;
   gap: 12px;
   margin-bottom: 25px;
-  max-width: 85%;
+  max-width: 75%;
   flex-direction: row-reverse;
   padding-right: 5px;
-  margin-right: 24px; /* separa del borde derecho y la barra de scroll */
+  margin-right: 0;
 }
 
 .user-avatar-circle {
@@ -390,6 +424,26 @@
   }
 }
 
+/* Media query para pantallas muy anchas */
+@media (min-width: 1400px) {
+  .chat-container {
+    max-width: 1400px;
+    padding: 110px 40px 10px 40px;
+  }
+  .chat-main-container {
+    --chat-max: 1400px;
+    --chat-padding: 40px;
+  }
+  
+  .ai-message-container {
+    max-width: 65%;
+  }
+  
+  .user-message-container {
+    max-width: 65%;
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .chat-main-container {
@@ -418,8 +472,13 @@
   .theme-toggle-container {
     top: 12px;
     right: 12px;
-    transform: scale(0.85);
     z-index: 1001;
+  }
+
+  /* Escalar ambos botones de acción por igual */
+  .new-conversation-button,
+  .settings-button {
+    transform: scale(0.85);
   }
 
   .menu-button,
@@ -558,8 +617,13 @@
   .theme-toggle-container {
     top: 10px;
     right: 10px;
-    transform: scale(0.75);
     z-index: 1001;
+  }
+
+  /* Escalar ambos botones de acción por igual */
+  .new-conversation-button,
+  .settings-button {
+    transform: scale(0.75);
   }
 
   .menu-button,
@@ -695,6 +759,11 @@
   .theme-toggle-container {
     top: 4px;
     right: 4px;
+  }
+
+  /* Escalar ambos botones de acción por igual */
+  .new-conversation-button,
+  .settings-button {
     transform: scale(0.7);
   }
 
