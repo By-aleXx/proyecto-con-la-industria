@@ -132,7 +132,7 @@ const ChatRecommendations = () => {
     }
   };
 
-  const handleColorConfirmed = (color) => {
+  const handleColorConfirmed = async (color) => {
     setShowColorPicker(false);
     
     // Agregar la imagen al chat como mensaje del usuario
@@ -147,20 +147,58 @@ const ChatRecommendations = () => {
     };
     setMessages(prev => [...prev, imageMessage]);
     
-    // Respuesta de la IA
-    const responseMessage = {
-      id: Date.now() + 1,
-      type: 'ai',
-      text: `Perfecto, he detectado el color **${color.hex}** (RGB: ${color.rgb}). Ahora buscaré pisos que coincidan con este color. Esta funcionalidad estará disponible cuando el backend esté implementado.`,
-      timestamp: new Date()
-    };
+    // Enviar mensaje al backend para buscar por color
+    setIsTyping(true);
     
-    setTimeout(() => {
-      setMessages(prev => [...prev, responseMessage]);
-    }, 500);
-    
-    // Aquí puedes agregar lógica adicional para buscar productos
-    console.log('Color seleccionado para búsqueda:', color);
+    try {
+      // Preparar el mensaje para el backend
+      const mensajeBusqueda = `Buscar piso con color similar a ${color.hex}`;
+      
+      // Preparar historial incluyendo el mensaje de la imagen
+      const historial = [...messages, imageMessage].map(msg => ({
+        role: msg.type === 'user' ? 'user' : 'assistant',
+        content: msg.text
+      }));
+      
+      // Agregar el mensaje de búsqueda
+      historial.push({
+        role: 'user',
+        content: mensajeBusqueda
+      });
+      
+      // Enviar al backend
+      const response = await chatService.sendMessage(mensajeBusqueda, sessionId, historial);
+      
+      // Agregar respuesta de Laura con los resultados
+      const aiMessage = {
+        id: Date.now() + 1,
+        type: 'ai',
+        text: response.respuesta,
+        timestamp: new Date(),
+        metadata: response.metadata
+      };
+      
+      setMessages(prev => [...prev, aiMessage]);
+      
+      // Actualizar session_id si es necesario
+      if (response.session_id && response.session_id !== sessionId) {
+        setSessionId(response.session_id);
+        chatService.setCurrentSessionId(response.session_id);
+      }
+      
+    } catch (error) {
+      console.error('Error al buscar por color:', error);
+      
+      const errorMessage = {
+        id: Date.now() + 1,
+        type: 'ai',
+        text: 'Lo siento, hubo un error al buscar pisos con ese color. Por favor, intenta de nuevo.',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const handleSendMessage = async () => {
@@ -286,6 +324,7 @@ const ChatRecommendations = () => {
           onClick={handleGoToMenu}
           className="menu-button"
           style={{
+            display: 'none',
             background: 'rgba(52, 152, 219, 0.2)',
             border: 'none',
             color: 'rgba(52, 152, 219, 1)',
@@ -433,33 +472,42 @@ const ChatRecommendations = () => {
             margin: '0 auto', 
             display: 'flex', 
             alignItems: 'center', 
-            gap: '10px',
+            gap: '12px',
             padding: '0 20px'
           }}>
             {/* Botón de cámara a la izquierda */}
             <button
               onClick={handleImageClick}
               style={{
-                background: 'transparent',
-                color: isDark ? '#fff' : '#000',
+                background: '#3498db',
+                color: '#fff',
                 border: 'none',
                 borderRadius: '50%',
-                width: '100px',
-                height: '100px',
+                padding: '12px',
+                width: '48px',
+                height: '48px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '48px',
-                marginRight: '16px',
-                alignSelf: 'center',
-                lineHeight: 0,
                 cursor: 'pointer',
-                transform: 'translateY(-6px)',
-                boxShadow: 'none'
+                boxShadow: '0 2px 5px rgba(0,0,0,0.15)',
+                transition: 'all 0.3s ease'
               }}
               title="Subir o tomar foto"
             >
-              <span role="img" aria-label="camara" style={{ fontSize: 48 }}>📸</span>
+              <svg 
+                width="20" 
+                height="20" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              >
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+              </svg>
             </button>
             <input
               ref={inputRef}
@@ -487,15 +535,33 @@ const ChatRecommendations = () => {
                 background: isTyping || !inputText.trim() ? '#95a5a6' : '#43cea2',
                 color: '#fff',
                 border: 'none',
-                borderRadius: '20px',
-                padding: '12px 32px',
+                borderRadius: '50%',
+                padding: '12px',
+                width: '48px',
+                height: '48px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 fontSize: '1rem',
                 cursor: isTyping || !inputText.trim() ? 'not-allowed' : 'pointer',
                 fontWeight: 'bold',
-                boxShadow: '0 2px 5px rgba(0,0,0,0.15)'
+                boxShadow: '0 2px 5px rgba(0,0,0,0.15)',
+                transition: 'all 0.3s ease'
               }}
             >
-              Enviar
+              <svg 
+                width="20" 
+                height="20" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              >
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
             </button>
           </div>
         </div>
