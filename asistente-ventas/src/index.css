@@ -28,6 +28,35 @@ code {
   }
 }
 
+/* Scrollbar discreto en pantallas anchas */
+@media screen and (min-width: 1024px) {
+  /* Firefox */
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+  }
+
+  /* WebKit (Chrome, Edge, Safari) */
+  body::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  body::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  body::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.25);
+    border-radius: 8px;
+    border: 3px solid transparent; /* crea separación del borde */
+    background-clip: content-box;
+  }
+
+  body:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.4);
+  }
+}
+
 /* Media queries para responsividad */
 @media screen and (max-width: 768px) {
   .chat-container {
