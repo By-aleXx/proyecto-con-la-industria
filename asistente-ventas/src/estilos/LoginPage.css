@@ -73,8 +73,9 @@
 }
 
 .secondary-button:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: linear-gradient(90deg, #3bb58f 0%, #144a85 100%);
   transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(67, 206, 162, 0.4);
 }
 
 /* Formularios */
