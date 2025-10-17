@@ -17,7 +17,7 @@ const ChatRecommendations = () => {
     {
       id: 1,
       type: 'ai',
-      text: `¡Hola ${user?.first_name || user?.username || ''}! Mi nombre es Laura y estoy aquí para ayudarte. ¿En qué puedo asistirte hoy?`,
+      text: `¡Hola ${user?.first_name || user?.username || ''}! Mi nombre es Cesar Antonio pero me puedes llamar CesanTony 😉 Estoy diseñado para guiarte en la búsqueda del piso perfecto para tu proyecto. ¿En qué puedo asistirte hoy?`,
       timestamp: new Date()
     }
   ]);
@@ -310,7 +310,7 @@ const ChatRecommendations = () => {
       {
         id: Date.now(),
         type: 'ai',
-        text: `¡Hola ${user?.first_name || user?.username || ''}! Iniciemos una nueva conversación. ¿En qué puedo ayudarte?`,
+        text: `¡Hola ${user?.first_name || user?.username || ''}! Mi nombre es Cesar Antonio pero me puedes llamar CesanTony 😉 Estoy diseñado para guiarte en la búsqueda del piso perfecto para tu proyecto. ¿En qué puedo asistirte hoy?`,
         timestamp: new Date()
       }
     ]);
