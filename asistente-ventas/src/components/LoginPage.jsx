@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import anime from 'animejs';
 import { useAuth } from '../context/AuthContext';
-import ThemeToggle from './ThemeToggle';
+import ThemeToggleSimple from './ThemeToggleSimple';
 import '../estilos/index.css';
 import '../estilos/LoginPage.css';
 
@@ -25,6 +25,13 @@ const LoginPage = () => {
 
   const { login, register, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedTheme = localStorage.getItem('theme');
+    if (storedTheme === 'dark') {
+      setIsDark(true);
+    }
+  }, []);
 
   useEffect(() => {
     // Si ya está autenticado, redirigir al chat
@@ -133,7 +140,14 @@ const LoginPage = () => {
       }}
     >
       <div className="theme-toggle-container">
-        <ThemeToggle onToggle={() => setIsDark(!isDark)} isDark={isDark} showGear={false} />
+        <ThemeToggleSimple 
+          onToggle={() => {
+            const next = !isDark;
+            setIsDark(next);
+            localStorage.setItem('theme', next ? 'dark' : 'light');
+          }} 
+          isDark={isDark} 
+        />
       </div>
       
       {view === 'welcome' && (
@@ -161,8 +175,25 @@ const LoginPage = () => {
       {view === 'login' && (
         <form className="form-container fade-in" onSubmit={handleLogin}>
           <div className="regresar-container">
-            <button type="button" className="regresar-btn" onClick={() => setView('welcome')}>
-              ⏪ Regresar
+            <button 
+              type="button" 
+              className="regresar-btn" 
+              onClick={() => setView('welcome')} 
+              aria-label="Regresar"
+              title="Regresar"
+            >
+              <svg 
+                width="20" 
+                height="20" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              >
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
             </button>
           </div>
           <h2 className="login-title" style={{ color: isDark ? '#fff' : '#333' }}>
@@ -210,9 +241,28 @@ const LoginPage = () => {
       
       {view === 'register' && (
         <form className="form-container fade-in" onSubmit={handleRegister}>
-          <button type="button" className="back-button" onClick={() => setView('welcome')}>
-            ⏪ Regresar
-          </button>
+          <div className="regresar-container">
+            <button 
+              type="button" 
+              className="regresar-btn" 
+              onClick={() => setView('welcome')} 
+              aria-label="Regresar"
+              title="Regresar"
+            >
+              <svg 
+                width="20" 
+                height="20" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              >
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+            </button>
+          </div>
           <h2 className="form-title" style={{ color: isDark ? '#fff' : '#333' }}>
             Formulario de registro
           </h2>

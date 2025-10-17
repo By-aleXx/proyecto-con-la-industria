@@ -220,11 +220,65 @@
 }
 
 /* Toggle de tema */
-.theme-toggle-container {
+.login-main-container .theme-toggle-container {
   position: absolute;
   top: 20px;
   right: 20px;
   z-index: 1000;
+}
+
+/* Overrides para modo oscuro en bienvenida, login y registro */
+.login-main-container.dark .welcome-title {
+  color: #ffffff;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+.login-main-container.dark .welcome-subtitle {
+  color: rgba(255,255,255,0.75);
+}
+.login-main-container.dark .form-container {
+  background: rgba(16, 16, 16, 0.85);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.45);
+}
+.login-main-container.dark .form-title,
+.login-main-container.dark .login-title {
+  color: #ffffff;
+}
+.login-main-container.dark .form-label {
+  color: #e0e0e0;
+}
+.login-main-container.dark .form-input,
+.login-main-container.dark .form-select {
+  background: rgba(0,0,0,0.35);
+  border-color: #444;
+  color: #ffffff;
+}
+.login-main-container.dark .form-input::placeholder,
+.login-main-container.dark .form-select::placeholder {
+  color: rgba(255,255,255,0.7);
+}
+.login-main-container.dark .form-input:focus,
+.login-main-container.dark .form-select:focus {
+  border-color: #6c5ce7;
+  box-shadow: 0 0 0 3px rgba(108,92,231,0.25);
+}
+.login-main-container.dark .form-link {
+  color: #aab4ff;
+}
+.login-main-container.dark .form-link:hover {
+  color: #cdd3ff;
+}
+.login-main-container.dark .back-button {
+  color: #cccccc;
+}
+.login-main-container.dark .back-button:hover {
+  background: rgba(255,255,255,0.08);
+}
+.login-main-container.dark .regresar-btn {
+  background: #3a3a3a;
+  color: #eeeeee;
+}
+.login-main-container.dark .regresar-btn:hover {
+  background: #4a4a4a;
 }
 
 /* Responsive Design */
@@ -487,19 +541,22 @@
 /* Estilos adicionales para componentes */
 .back-button {
   align-self: flex-start;
-  background: none;
-  border: none;
-  color: #888;
-  font-weight: bold;
-  margin-bottom: 10px;
+  background: transparent;
+  border: 1px solid rgba(0,0,0,0.12);
+  color: #555;
+  font-weight: 600;
+  margin-bottom: 20px;
   cursor: pointer;
-  padding: 8px;
-  border-radius: 5px;
-  transition: background 0.3s;
+  padding: 8px 12px;
+  border-radius: 10px;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+.back-button svg { stroke: currentColor; }
+
 .back-button:hover {
-  background: rgba(0,0,0,0.1);
+  background: rgba(0,0,0,0.06);
+  border-color: rgba(0,0,0,0.2);
 }
 
 .forgot-button {
@@ -573,15 +630,47 @@
 }
 
 .regresar-btn {
-  background: #e3e3e3;
-  color: #333;
-  border: none;
-  border-radius: 18px;
-  padding: 12px 32px;
-  font-size: 18px;
-  font-weight: bold;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  background: transparent;
+  color: #555;
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: none;
   margin-right: 8px;
   cursor: pointer;
-  transition: background 0.3s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.regresar-btn svg { stroke: currentColor; }
+
+.regresar-btn:hover {
+  background: rgba(0,0,0,0.06);
+  border-color: rgba(0,0,0,0.2);
+}
+
+.login-main-container.dark .regresar-btn {
+  color: #ddd;
+  border-color: rgba(255,255,255,0.18);
+}
+
+.login-main-container.dark .regresar-btn:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.28);
+}
+
+/* Dark mode for back-button */
+.login-main-container.dark .back-button {
+  background: transparent;
+  border-color: rgba(255,255,255,0.18);
+  color: #ddd;
+}
+
+.login-main-container.dark .back-button:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.28);
 }

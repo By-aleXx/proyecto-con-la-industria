@@ -159,6 +159,7 @@ const SettingsMenu = ({ onLogout, onChangePassword, onToggle, isDark, open: exte
               Cambiar contraseña
             </button>
           )}
+          {onLogout && (
           <button
             type="button"
             onClick={() => { 
@@ -203,6 +204,7 @@ const SettingsMenu = ({ onLogout, onChangePassword, onToggle, isDark, open: exte
             </svg>
             Cerrar sesión
           </button>
+          )}
         </div>
       )}
     </div>

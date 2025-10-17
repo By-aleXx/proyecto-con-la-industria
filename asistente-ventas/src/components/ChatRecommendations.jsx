@@ -60,6 +60,12 @@ const ChatRecommendations = () => {
     // Auto scroll al final
     scrollToBottom();
     
+    // Leer tema persistido
+    const storedTheme = localStorage.getItem('theme');
+    if (storedTheme === 'dark') {
+      setIsDark(true);
+    }
+
     // Obtener o crear session_id
     const currentSessionId = chatService.getCurrentSessionId();
     if (currentSessionId) {
@@ -320,7 +326,11 @@ const ChatRecommendations = () => {
       {/* Theme Toggle */}
       <div className="theme-toggle-container">
         <ThemeToggle 
-          onToggle={() => setIsDark(!isDark)} 
+          onToggle={() => {
+            const next = !isDark;
+            setIsDark(next);
+            localStorage.setItem('theme', next ? 'dark' : 'light');
+          }} 
           isDark={isDark} 
           onLogout={handleLogout}
           onChangePassword={() => setShowChangePassword(true)}
