@@ -67,7 +67,7 @@ Por defecto apunta a: `http://localhost:8000/api`
 ```
 asistente-ventas/
 ├── public/
-│   ├── avatar-laura.svg
+│   ├── avatar.svg
 │   ├── favicon.ico
 │   └── index.html
 ├── src/
