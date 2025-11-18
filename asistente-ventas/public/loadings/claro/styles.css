@@ -1,0 +1,88 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #fff;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pair {
+    display: flex;
+    align-items: center;
+    gap: 60px; /* separación entre los dos grids */
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 8px;
+    padding: 20px;
+    border-radius: 15px;
+    transform: skewX(-20deg);
+}
+
+.square {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    animation: zoomPulse 2s ease-in-out var(--delay) infinite;
+    transform-origin: center;
+    /* Sin contrainclinación: cada celda toma la forma de romboide por la inclinación del contenedor */
+}
+
+/* Colores para cada cuadrado */
+/* Izquierdo: tonos verdes */
+.pair .grid:not(.right) .square:nth-child(1) { background-color: #6AA525; }
+.pair .grid:not(.right) .square:nth-child(2) { background-color: #2F852A; }
+.pair .grid:not(.right) .square:nth-child(3) { background-color: #026829; }
+.pair .grid:not(.right) .square:nth-child(4) { background-color: #6AA525; }
+.pair .grid:not(.right) .square:nth-child(5) { background-color: #2F852A; }
+.pair .grid:not(.right) .square:nth-child(6) { background-color: #026829; }
+.pair .grid:not(.right) .square:nth-child(7) { background-color: #6AA525; }
+.pair .grid:not(.right) .square:nth-child(8) { background-color: #2F852A; }
+.pair .grid:not(.right) .square:nth-child(9) { background-color: #026829; }
+
+/* Derecho: rojos (fila 1), naranjas (fila 2), azules (fila 3) */
+.grid.right .square:nth-child(1) { background-color: #E30713; } /* rojo claro */
+.grid.right .square:nth-child(2) { background-color: #E74013; } /* rojo medio */
+.grid.right .square:nth-child(3) { background-color: #EE7202; } /* rojo oscuro */
+.grid.right .square:nth-child(4) { background-color: #E30713; } /* naranja claro */
+.grid.right .square:nth-child(5) { background-color: #E74013; } /* naranja medio */
+.grid.right .square:nth-child(6) { background-color: #EE7202; } /* naranja oscuro */
+.grid.right .square:nth-child(7) { background-color: #E30713; } /* azul claro */
+.grid.right .square:nth-child(8) { background-color: #E74013; } /* azul medio */
+.grid.right .square:nth-child(9) { background-color: #EE7202; } /* azul oscuro */
+
+/* Animación de zoom */
+@keyframes zoomPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.8;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .square {
+        width: 60px;
+        height: 60px;
+    }
+}

@@ -455,14 +455,52 @@ const ChatRecommendations = () => {
             <div className="message-ai">
               <div className="ai-message-container">
                 <div className="avatar-circle">
-                  <div className="avatar-fallback" style={{backgroundColor: '#8B4A42'}}>L</div>
+                  <img 
+                    src="/avatar.svg" 
+                    alt="Laura"
+                    className="avatar-image"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
+                  />
+                  <div className="avatar-fallback" style={{display: 'none', backgroundColor: '#8B4A42'}}>L</div>
                 </div>
                 <div className="ai-message">
-                  <div className="typing-indicator">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                  </div>
+                  {!isDark ? (
+                    // Animación para tema claro
+                    <div className="loading-grid-container">
+                      <div className="loading-grid">
+                        <div className="loading-square" style={{'--delay': '0.1s'}}></div>
+                        <div className="loading-square" style={{'--delay': '0.2s'}}></div>
+                        <div className="loading-square" style={{'--delay': '0.3s'}}></div>
+                        <div className="loading-square" style={{'--delay': '0.4s'}}></div>
+                        <div className="loading-square" style={{'--delay': '0.5s'}}></div>
+                        <div className="loading-square" style={{'--delay': '0.6s'}}></div>
+                        <div className="loading-square" style={{'--delay': '0.7s'}}></div>
+                        <div className="loading-square" style={{'--delay': '0.8s'}}></div>
+                        <div className="loading-square" style={{'--delay': '0.9s'}}></div>
+                      </div>
+                      <div className="loading-grid right">
+                        <div className="loading-square" style={{'--delay': '0.1s'}}></div>
+                        <div className="loading-square" style={{'--delay': '0.2s'}}></div>
+                        <div className="loading-square" style={{'--delay': '0.3s'}}></div>
+                        <div className="loading-square" style={{'--delay': '0.4s'}}></div>
+                        <div className="loading-square" style={{'--delay': '0.5s'}}></div>
+                        <div className="loading-square" style={{'--delay': '0.6s'}}></div>
+                        <div className="loading-square" style={{'--delay': '0.7s'}}></div>
+                        <div className="loading-square" style={{'--delay': '0.8s'}}></div>
+                        <div className="loading-square" style={{'--delay': '0.9s'}}></div>
+                      </div>
+                    </div>
+                  ) : (
+                    // Animación para tema oscuro (la existente)
+                    <div className="typing-indicator">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
