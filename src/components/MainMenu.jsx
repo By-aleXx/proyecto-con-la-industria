@@ -4,10 +4,8 @@ import anime from 'animejs';
 import { useAuth } from '../context/AuthContext';
 import chatService from '../services/chatService';
 import LoadingScreen from './LoadingScreen';
-import ThemeToggle from './ThemeToggle';
 import ChangePasswordModal from './ChangePasswordModal';
 import '../estilos/MainMenu.css';
-import '../estilos/ChatRecommendations.css';
 
 const MainMenu = () => {
   const { user, logout, changePassword } = useAuth();
@@ -21,6 +19,13 @@ const MainMenu = () => {
   const [isDark, setIsDark] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
 
+  useEffect(() => {
+    const storedTheme = localStorage.getItem('theme');
+    if (storedTheme === 'dark') {
+      setIsDark(true);
+      document.body.classList.add('dark-mode');
+    }
+  }, []);
 
   useEffect(() => {
     anime({
@@ -33,12 +38,24 @@ const MainMenu = () => {
     });
   }, []);
 
+  const toggleTheme = () => {
+    const next = !isDark;
+    setIsDark(next);
+    localStorage.setItem('theme', next ? 'dark' : 'light');
+    if (next) {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
+  };
+
   const menuOptions = [
     {
       id: 1,
       text: '¿En qué te puedo ayudar?',
       subtitle: user?.first_name || user?.username || '',
       icon: '💬',
+      type: 'help',
       action: () => handleOptionClick('help')
     },
     {
@@ -75,7 +92,6 @@ const MainMenu = () => {
     setSelectedOption(optionType);
     
     if (optionType === 'help') {
-      // Ir directamente al chat
       navigate('/chat');
       return;
     }
@@ -90,7 +106,6 @@ const MainMenu = () => {
     setLoadingText(loadingTexts[optionType] || 'Cargando...');
     setIsLoading(true);
 
-    // Simular la carga por 4 segundos y luego volver al menú (sin navegar)
     setTimeout(() => {
       setIsLoading(false);
 
@@ -122,83 +137,95 @@ const MainMenu = () => {
   };
 
   return (
-    <div
-      className={`main-menu-container chat-main-container ${isDark ? 'dark' : 'light'}`}
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        transition: 'background 0.5s',
-        padding: '20px',
-        position: 'relative',
-        overflow: 'hidden'
-      }}
-    >
-      {/* Theme Toggle - Pequeño y en la esquina superior derecha */}
-      <div className="theme-toggle-container" style={themeToggleContainerStyle}>
-        <ThemeToggle 
-          onToggle={() => setIsDark(!isDark)} 
-          isDark={isDark} 
-          onLogout={handleLogout}
-          onChangePassword={() => setShowChangePassword(true)}
-        />
-      </div>
-
-      {/* Botones de navegación */}
-      <div className="nav-buttons-container" style={navButtonsContainerStyle}>
-        <button 
-          className="nav-button"
-          onClick={handleGoToChat}
-          style={backButtonStyle}
-        >
-          ← Regresar al Chat
-        </button>
-      </div>
-
-      {/* Contenedor de opciones */}
-      <div className="menu-container" style={menuContainerStyle}>
-        {menuOptions.map((option, index) => (
-          <div
-            key={option.id}
-            className="menu-item"
-            data-option={option.id}
-            onClick={() => option.action && option.action()}
-            style={{
-              ...menuItemStyle,
-              ...(selectedOption === option.type && selectedOptionStyle)
-            }}
-          >
-            <span className="menu-item-icon" style={iconStyle}>{option.icon}</span>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <span className="menu-item-text" style={textStyle}>{option.text}</span>
-              {option.subtitle && (
-                <span style={{ fontSize: '13px', color: 'rgba(0,0,0,0.55)', marginTop: '6px' }}>{option.subtitle}</span>
-              )}
-            </div>
+    <div className={`main-menu-container ${isDark ? 'dark' : 'light'}`}>
+      {/* Header */}
+      <header className="menu-header">
+        <div className="header-left">
+          <button className="btn-back" onClick={handleGoToChat}>
+            ← Regresar al Chat
+          </button>
+        </div>
+        
+        <div className="header-logo">
+          <span className="logo-text">CESANTONI</span>
+        </div>
+        
+        <div className="header-right">
+          {/* Theme Toggle */}
+          <div className="theme-toggle">
+            <label className="switch" title={isDark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}>
+              <input 
+                type="checkbox" 
+                checked={isDark}
+                onChange={toggleTheme}
+              />
+              <span className="slider">
+                <span className="icon sun">☀️</span>
+                <span className="icon moon">🌙</span>
+              </span>
+            </label>
           </div>
-        ))}
-      </div>
+          
+          {/* Menu de usuario */}
+          <div className="user-menu">
+            <button className="btn-user" onClick={() => setShowChangePassword(true)}>
+              ⚙️
+            </button>
+            <button className="btn-logout" onClick={handleLogout}>
+              Cerrar Sesión
+            </button>
+          </div>
+        </div>
+      </header>
 
-      {/* Indicador inferior */}
-      <div className="bottom-indicator" style={bottomIndicatorStyle}>
-        <div className="indicator-bar" style={indicatorBarStyle}></div>
-      </div>
+      {/* Contenido principal */}
+      <main className="menu-content">
+        <div className="menu-wrapper">
+          <h1 className="menu-title">Menú Principal</h1>
+          <p className="menu-subtitle">Selecciona una opción para continuar</p>
+
+          {/* Opciones del menú */}
+          <div className="menu-options">
+            {menuOptions.map((option) => (
+              <div
+                key={option.id}
+                className={`menu-item ${selectedOption === option.type ? 'selected' : ''}`}
+                onClick={() => option.action && option.action()}
+              >
+                <span className="menu-item-icon">{option.icon}</span>
+                <div className="menu-item-content">
+                  <span className="menu-item-text">{option.text}</span>
+                  {option.subtitle && (
+                    <span className="menu-item-subtitle">{option.subtitle}</span>
+                  )}
+                </div>
+                <span className="menu-item-arrow">→</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="menu-footer">
+        <div className="indicator-bar"></div>
+      </footer>
       
       {/* Pantalla de carga overlay */}
       {isLoading && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 2000 }}>
-          <LoadingScreen isDark={isDark} loadingText={loadingText} onToggleTheme={() => setIsDark(!isDark)} />
+        <div className="loading-overlay">
+          <LoadingScreen isDark={isDark} loadingText={loadingText} onToggleTheme={toggleTheme} />
         </div>
       )}
       
-      {/* Toast no bloqueante */}
+      {/* Toast */}
       {showToast && (
-        <div style={toastStyle} role="status">
+        <div className="toast" role="status">
           {toastMessage}
         </div>
       )}
 
-      {/* Change Password Modal */}
+      {/* Modal de cambio de contraseña */}
       <ChangePasswordModal
         isOpen={showChangePassword}
         onClose={() => setShowChangePassword(false)}
@@ -207,112 +234,6 @@ const MainMenu = () => {
       />
     </div>
   );
-};
-
-// Estilos
-const themeToggleContainerStyle = {
-  position: 'absolute',
-  top: '15px',
-  right: '15px',
-  zIndex: 1000,
-  transform: 'scale(1.0)' // Tamaño normal para el toggle
-};
-
-const navButtonsContainerStyle = {
-  position: 'absolute',
-  top: '15px',
-  left: '15px',
-  display: 'flex',
-  gap: '10px',
-  zIndex: 1000
-};
-
-const backButtonStyle = {
-  background: 'rgba(52, 152, 219, 0.2)',
-  border: 'none',
-  color: 'rgba(52, 152, 219, 1)',
-  padding: '8px 12px',
-  borderRadius: '15px',
-  fontSize: '14px',
-  cursor: 'pointer',
-  fontWeight: 'bold',
-  transition: 'all 0.3s ease'
-};
-
-const menuContainerStyle = {
-  flex: 1,
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  alignItems: 'center',
-  gap: '15px',
-  padding: '20px 0',
-  paddingTop: '80px' // Espacio para los botones superiores
-};
-
-const menuItemStyle = {
-  width: '90%',
-  maxWidth: '350px',
-  padding: '18px 20px',
-  borderRadius: '15px',
-  backgroundColor: 'rgba(255, 255, 255, 0.8)',
-  cursor: 'pointer',
-  transition: 'all 0.3s ease',
-  display: 'flex',
-  alignItems: 'center',
-  gap: '15px',
-  boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
-  backdropFilter: 'blur(10px)',
-  border: '1px solid rgba(255,255,255,0.2)',
-  fontSize: '16px',
-  fontWeight: '500',
-  color: '#333',
-  userSelect: 'none'
-};
-
-const selectedOptionStyle = {
-  backgroundColor: 'rgba(52, 152, 219, 0.2)',
-  transform: 'scale(0.98)',
-  boxShadow: '0 2px 10px rgba(0,0,0,0.15)',
-  borderLeft: '4px solid #3498db'
-};
-
-const iconStyle = {
-  fontSize: '20px',
-  minWidth: '25px'
-};
-
-const textStyle = {
-  fontSize: '16px',
-  lineHeight: '1.3',
-  textAlign: 'left'
-};
-
-const bottomIndicatorStyle = {
-  display: 'flex',
-  justifyContent: 'center',
-  padding: '20px 0',
-  paddingBottom: '30px'
-};
-
-const indicatorBarStyle = {
-  width: '134px',
-  height: '5px',
-  backgroundColor: 'rgba(255,255,255,0.6)',
-  borderRadius: '3px'
-};
-
-const toastStyle = {
-  position: 'fixed',
-  top: '20px',
-  right: '20px',
-  background: 'rgba(0,0,0,0.85)',
-  color: 'white',
-  padding: '12px 16px',
-  borderRadius: '8px',
-  zIndex: 3000,
-  maxWidth: '320px',
-  boxShadow: '0 6px 18px rgba(0,0,0,0.2)'
 };
 
 export default MainMenu;

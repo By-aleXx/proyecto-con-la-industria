@@ -1,100 +1,264 @@
-/* Estilos para LoginPage */
+/* LoginPage.css - Estilos Cesantoni */
 
-/* Contenedor principal */
-.login-main-container {
+/* ========== CONTENEDOR PRINCIPAL ========== */
+.cesantoni-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: var(--bg);
+  transition: background 0.3s ease;
+}
+
+.cesantoni-container.dark {
+  background: var(--bg);
+}
+
+/* ========== HEADER ========== */
+.cesantoni-header {
+  padding: 24px 32px;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  transition: background 0.5s;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-light);
 }
 
-/* Modo claro */
-.login-main-container.light {
-  background: linear-gradient(135deg, #a8e6cf 0%, #88d8c0 50%, #7cc7bb 100%);
+.header-logo {
+  display: flex;
+  align-items: center;
 }
 
-/* Modo oscuro */
-.login-main-container.dark {
-  background: linear-gradient(135deg, #434343 0%, #000000 100%);
+.logo-text {
+  font-size: 1.8rem;
+  font-weight: 300;
+  letter-spacing: 4px;
+  color: var(--color-primary);
+  text-transform: uppercase;
 }
 
-/* Pantalla de bienvenida */
-.welcome-screen {
-  text-align: center;
+/* ========== THEME TOGGLE SWITCH ========== */
+.theme-toggle {
+  display: flex;
+  align-items: center;
 }
 
-.welcome-title {
-  font-size: 3rem;
-  font-weight: bold;
-  color: rgba(0,0,0,0.8);
-  margin-bottom: 20px;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 30px;
+  cursor: pointer;
 }
 
-.welcome-subtitle {
-  font-size: 1.2rem;
-  color: rgba(0,0,0,0.6);
-  margin-bottom: 40px;
-  line-height: 1.5;
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
 }
 
-/* Botones principales */
-.primary-button {
-  background: linear-gradient(90deg, #d9a7c7 0%, #9d7be7 100%);
-  color: white;
-  border: none;
-  border-radius: 25px;
-  padding: 15px 40px;
-  font-size: 18px;
-  font-weight: bold;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  margin-bottom: 16px;
-  transition: background 0.3s;
+.slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #E8E4E0;
+  border: 2px solid var(--color-primary);
+  border-radius: 30px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
 }
 
-.primary-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0,123,255,0.4);
+.slider::before {
+  content: '';
+  position: absolute;
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  background-color: var(--color-primary);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  z-index: 2;
 }
 
-.secondary-button {
-  background: linear-gradient(90deg, #43cea2 0%, #185a9d 100%);
-  color: white;
-  border: none;
-  border-radius: 25px;
-  padding: 15px 40px;
-  font-size: 18px;
-  font-weight: bold;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  margin-bottom: 16px;
-  transition: background 0.3s;
+.switch input:checked + .slider {
+  background-color: #2C2C2C;
+  border-color: #B8985F;
 }
 
-.secondary-button:hover {
-  background: linear-gradient(90deg, #3bb58f 0%, #144a85 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(67, 206, 162, 0.4);
+.switch input:checked + .slider::before {
+  transform: translateX(28px);
+  background-color: #FFD700;
 }
 
-/* Formularios */
-.form-container {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 20px;
-  padding: 40px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+.slider .icon {
+  position: absolute;
+  font-size: 14px;
+  z-index: 1;
+  transition: opacity 0.3s ease;
+}
+
+.slider .sun {
+  left: 6px;
+  opacity: 1;
+}
+
+.slider .moon {
+  right: 6px;
+  opacity: 0;
+}
+
+.switch input:checked + .slider .sun {
+  opacity: 0;
+}
+
+.switch input:checked + .slider .moon {
+  opacity: 1;
+}
+
+/* ========== VISTA UNIFICADA (LOGIN) ========== */
+.unified-view {
+  flex: 1;
+  padding: 48px 20px;
+}
+
+.unified-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: start;
+}
+
+.branch-column,
+.login-column {
   width: 100%;
-  max-width: 400px;
-  margin: 20px;
 }
 
-.form-title {
+/* Títulos */
+.step-title {
   font-size: 2rem;
-  font-weight: bold;
-  color: #333;
-  text-align: center;
-  margin-bottom: 30px;
+  font-weight: 400;
+  color: var(--color-secondary);
+  margin: 0 0 12px 0;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.step-subtitle {
+  font-size: 0.95rem;
+  color: var(--color-muted);
+  margin: 0 0 32px 0;
+  text-align: left;
+  font-weight: 300;
+  line-height: 1.6;
+}
+
+/* ========== BUSCADOR ========== */
+.search-box {
+  margin-bottom: 32px;
+}
+
+.search-input {
+  width: 100%;
+  font-size: 0.95rem;
+  padding: 14px 20px;
+  border: 2px solid var(--border-light);
+  background: var(--surface);
+}
+
+.search-input::placeholder {
+  color: var(--color-muted);
+  font-weight: 300;
+}
+
+/* ========== TARJETAS DE SUCURSAL ========== */
+.branch-section {
+  margin-bottom: 32px;
+}
+
+.branch-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.branch-card {
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.branch-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.branch-card.selected {
+  border: 2px solid var(--color-primary);
+  background: rgba(139, 111, 71, 0.08);
+}
+
+.dark .branch-card.selected {
+  background: rgba(184, 152, 95, 0.15);
+}
+
+.branch-card-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.branch-card-info {
+  flex: 1;
+}
+
+.branch-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-secondary);
+  margin: 0 0 4px 0;
+}
+
+.branch-location {
+  font-size: 0.875rem;
+  color: var(--color-muted);
+  margin: 0;
+}
+
+.btn-select-branch {
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  border-radius: var(--radius);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  font-size: 0.85rem;
+}
+
+.btn-select-branch:hover {
+  background: var(--color-primary-dark);
+}
+
+/* ========== FORMULARIO DE LOGIN ========== */
+.login-form {
+  margin-top: 24px;
 }
 
 .form-group {
@@ -103,575 +267,429 @@
 
 .form-label {
   display: block;
-  font-weight: 600;
-  color: #555;
-  margin-bottom: 8px;
-  font-size: 14px;
-}
-
-.form-input {
-  width: 100%;
-  padding: 12px 15px;
-  border: 2px solid #e1e1e1;
-  border-radius: 10px;
-  font-size: 16px;
-  transition: all 0.3s ease;
-  box-sizing: border-box;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
-}
-
-.form-select {
-  width: 100%;
-  padding: 12px 15px;
-  border: 2px solid #e1e1e1;
-  border-radius: 10px;
-  font-size: 16px;
-  background: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-sizing: border-box;
-}
-
-.form-select:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
-}
-
-/* Botones de formulario */
-.form-button {
-  width: 100%;
-  background: linear-gradient(135deg, #007bff, #0056b3);
-  color: white;
-  border: none;
-  border-radius: 10px;
-  padding: 15px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 10px;
-}
-
-.form-button:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(0,123,255,0.3);
-}
-
-.form-button:disabled {
-  background: linear-gradient(135deg, #ccc, #999);
-  cursor: not-allowed;
-  transform: none;
-}
-
-.form-link {
-  display: block;
-  text-align: center;
-  color: #007bff;
-  text-decoration: none;
-  margin-top: 15px;
+  font-size: 0.85rem;
   font-weight: 500;
-  transition: color 0.3s ease;
+  color: var(--color-secondary);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.form-link:hover {
-  color: #0056b3;
+.form-hint {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  margin-top: 4px;
+  display: block;
+}
+
+.password-input-wrapper {
+  position: relative;
+}
+
+.btn-toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.25rem;
+  padding: 4px;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.btn-toggle-password:hover {
+  opacity: 1;
+}
+
+.form-group-inline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-primary);
+}
+
+.link-forgot,
+.link-register,
+.link-login,
+.link-terms {
+  background: none;
+  border: none;
+  font-size: 0.875rem;
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.link-forgot:hover,
+.link-register:hover,
+.link-login:hover,
+.link-terms:hover {
   text-decoration: underline;
 }
 
-/* Estados de carga */
-.loading-state {
+.btn-block {
+  width: 100%;
+  padding: 16px;
+  font-size: 0.95rem;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  font-weight: 500;
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-dark);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.login-footer,
+.register-footer {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--color-muted);
+}
+
+.login-footer p,
+.register-footer p {
+  margin: 0;
+}
+
+/* ========== MENSAJES ========== */
+.message {
   display: flex;
   align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+}
+
+.message.error {
+  background: #FFEBEE;
+  color: #C62828;
+  border: 1px solid #EF5350;
+}
+
+.message.success {
+  background: #E8F5E9;
+  color: #2E7D32;
+  border: 1px solid #81C784;
+}
+
+.message-icon {
+  font-size: 1.25rem;
+}
+
+.message-text {
+  flex: 1;
+}
+
+/* ========== VISTA DE REGISTRO ========== */
+.register-view {
+  flex: 1;
+  padding: 48px 20px;
+  display: flex;
   justify-content: center;
-  gap: 10px;
+  align-items: center;
 }
 
-.loading-spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid #ffffff;
-  border-top: 2px solid transparent;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+.register-content {
+  width: 100%;
+  max-width: 700px;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+.register-form-wrapper {
+  background: var(--surface);
+  padding: 48px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
 }
 
-/* Animaciones de entrada */
+.register-title {
+  font-size: 2rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--color-text);
+  margin: 0 0 12px 0;
+  text-align: center;
+}
+
+.register-subtitle {
+  font-size: 0.95rem;
+  color: var(--color-muted);
+  margin: 0 0 32px 0;
+  text-align: center;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* Input de teléfono */
+.phone-group {
+  grid-column: 1 / -1;
+}
+
+.phone-input-wrapper {
+  display: flex;
+  gap: 12px;
+}
+
+.country-select {
+  flex: 0 0 120px;
+  font-size: 0.9rem;
+}
+
+.phone-input {
+  flex: 1;
+}
+
+/* ========== ANIMACIONES ========== */
 .fade-in {
-  opacity: 0;
-  transform: translateY(40px);
-  animation: fadeInUp 0.8s ease forwards;
+  animation: fadeInUp 0.6s ease-out forwards;
 }
 
 @keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-/* Toggle de tema */
-.login-main-container .theme-toggle-container {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  z-index: 1000;
+/* ========== RESPONSIVE ========== */
+@media (max-width: 968px) {
+  .unified-content {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .phone-group {
+    grid-column: 1;
+  }
 }
 
-/* Overrides para modo oscuro en bienvenida, login y registro */
-.login-main-container.dark .welcome-title {
-  color: #ffffff;
-  text-shadow: 0 2px 6px rgba(0,0,0,0.4);
-}
-.login-main-container.dark .welcome-subtitle {
-  color: rgba(255,255,255,0.75);
-}
-.login-main-container.dark .form-container {
-  background: rgba(16, 16, 16, 0.85);
-  box-shadow: 0 12px 32px rgba(0,0,0,0.45);
-}
-.login-main-container.dark .form-title,
-.login-main-container.dark .login-title {
-  color: #ffffff;
-}
-.login-main-container.dark .form-label {
-  color: #e0e0e0;
-}
-.login-main-container.dark .form-input,
-.login-main-container.dark .form-select {
-  background: rgba(0,0,0,0.35);
-  border-color: #444;
-  color: #ffffff;
-}
-.login-main-container.dark .form-input::placeholder,
-.login-main-container.dark .form-select::placeholder {
-  color: rgba(255,255,255,0.7);
-}
-.login-main-container.dark .form-input:focus,
-.login-main-container.dark .form-select:focus {
-  border-color: #6c5ce7;
-  box-shadow: 0 0 0 3px rgba(108,92,231,0.25);
-}
-.login-main-container.dark .form-link {
-  color: #aab4ff;
-}
-.login-main-container.dark .form-link:hover {
-  color: #cdd3ff;
-}
-.login-main-container.dark .back-button {
-  color: #cccccc;
-}
-.login-main-container.dark .back-button:hover {
-  background: rgba(255,255,255,0.08);
-}
-.login-main-container.dark .regresar-btn {
-  background: #3a3a3a;
-  color: #eeeeee;
-}
-.login-main-container.dark .regresar-btn:hover {
-  background: #4a4a4a;
-}
-
-/* Responsive Design */
 @media (max-width: 768px) {
-  .welcome-title {
-    font-size: 2.5rem;
+  .cesantoni-header {
+    padding: 16px 20px;
   }
-  
-  .welcome-subtitle {
-    font-size: 1.1rem;
-    padding: 0 20px;
+
+  .logo-text {
+    font-size: 1.4rem;
+    letter-spacing: 3px;
   }
-  
-  .form-container {
-    padding: 30px 20px;
-    margin: 10px;
+
+  .unified-view,
+  .register-view {
+    padding: 32px 16px;
   }
-  
-  .form-title {
-    font-size: 1.8rem;
+
+  .step-title,
+  .register-title {
+    font-size: 1.5rem;
   }
-  
-  .primary-button,
-  .secondary-button {
-    padding: 12px 30px;
-    font-size: 16px;
+
+  .step-subtitle,
+  .register-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .branch-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .branch-card-info {
+    flex: none;
+    width: 100%;
+  }
+
+  .btn-select-branch {
+    width: 100%;
+  }
+
+  .register-form-wrapper {
+    padding: 32px 24px;
+  }
+
+  .form-group-inline {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
   }
 }
 
 @media (max-width: 480px) {
-  .login-main-container {
-    min-height: 100vh;
-    height: 100vh;
-    width: 100vw;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    overflow: hidden;
-    padding: 5px;
+  .cesantoni-header {
+    padding: 12px 16px;
   }
 
-  .welcome-screen {
-    padding: 20px 10px;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    overflow-y: auto;
+  .logo-text {
+    font-size: 1.2rem;
+    letter-spacing: 2px;
   }
 
-  .welcome-title {
-    font-size: 2rem;
-    line-height: 1.2;
-    margin-bottom: 15px;
-  }
-  
-  .welcome-subtitle {
-    font-size: 1rem;
-    margin-bottom: 20px;
-    padding: 0 10px;
+  .switch {
+    width: 50px;
+    height: 26px;
   }
 
-  .welcome-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
-    max-width: 280px;
+  .slider::before {
+    height: 16px;
+    width: 16px;
   }
-  
-  .form-container {
-    padding: 15px;
-    margin: 5px;
-    width: calc(100% - 10px);
-    max-width: none;
-    max-height: calc(100vh - 80px);
-    overflow-y: auto;
-    box-sizing: border-box;
+
+  .switch input:checked + .slider::before {
+    transform: translateX(22px);
   }
-  
-  .form-title {
+
+  .slider .icon {
+    font-size: 12px;
+  }
+
+  .unified-view,
+  .register-view {
+    padding: 24px 12px;
+  }
+
+  .step-title,
+  .register-title {
+    font-size: 1.25rem;
+  }
+
+  .search-box {
+    margin-bottom: 16px;
+  }
+
+  .branch-list {
+    max-height: 300px;
+  }
+
+  .branch-card {
+    padding: 16px;
+  }
+
+  .branch-card-icon {
     font-size: 1.5rem;
-    margin-bottom: 15px;
-    text-align: center;
   }
 
-  .form-group {
-    margin-bottom: 12px;
+  .branch-name {
+    font-size: 1rem;
   }
 
-  .form-label {
-    font-size: 14px;
-    margin-bottom: 5px;
+  .register-form-wrapper {
+    padding: 24px 16px;
   }
 
-  .form-input,
-  .form-select {
-    padding: 10px;
-    font-size: 16px;
-    border-radius: 6px;
-    width: 100%;
-    box-sizing: border-box;
-    min-height: 44px;
-  }
-  
-  .primary-button,
-  .secondary-button {
-    padding: 10px 20px;
-    font-size: 14px;
-    margin: 5px 0;
-    width: 100%;
-    min-height: 44px;
-    border-radius: 6px;
+  .btn-block {
+    padding: 14px;
+    font-size: 0.9rem;
   }
 
-  .form-actions {
-    display: flex;
+  .phone-input-wrapper {
     flex-direction: column;
     gap: 8px;
-    margin-top: 15px;
   }
 
-  .form-links {
-    text-align: center;
-    margin-top: 15px;
-    padding: 10px 0;
-  }
-
-  .form-link {
-    font-size: 12px;
-    margin: 0 5px;
-    display: inline-block;
-    padding: 8px;
-    min-height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .theme-toggle-container {
-    top: 8px;
-    right: 8px;
-    transform: scale(0.8);
+  .country-select {
+    flex: 1;
+    width: 100%;
   }
 }
 
-/* Pantallas muy pequeñas */
-@media (max-width: 320px) {
-  .welcome-title {
-    font-size: 1.8rem;
-  }
-
-  .welcome-subtitle {
-    font-size: 0.9rem;
-  }
-
-  .form-container {
-    padding: 10px;
-  }
-
-  .form-title {
-    font-size: 1.3rem;
-  }
-
-  .form-input,
-  .form-select {
-    padding: 8px;
-    font-size: 14px;
-  }
-
-  .primary-button,
-  .secondary-button {
-    padding: 8px 16px;
-    font-size: 13px;
-  }
-
-  .form-link {
-    font-size: 11px;
-  }
+/* ========== MODO OSCURO ESPECÍFICO ========== */
+.dark .cesantoni-header {
+  background: var(--surface);
+  border-color: var(--border-light);
 }
 
-/* Orientación landscape en móviles */
-@media (max-width: 768px) and (orientation: landscape) and (max-height: 500px) {
-  .login-main-container {
-    height: 100vh;
-    overflow-y: auto;
-  }
-
-  .welcome-screen {
-    padding: 10px;
-    min-height: 100vh;
-  }
-
-  .welcome-title {
-    font-size: 1.8rem;
-    margin-bottom: 10px;
-  }
-
-  .welcome-subtitle {
-    font-size: 0.9rem;
-    margin-bottom: 15px;
-  }
-
-  .form-container {
-    max-height: calc(100vh - 40px);
-    overflow-y: auto;
-    padding: 10px;
-  }
-
-  .form-title {
-    font-size: 1.3rem;
-    margin-bottom: 10px;
-  }
-
-  .form-group {
-    margin-bottom: 8px;
-  }
-
-  .form-input,
-  .form-select {
-    padding: 6px;
-    font-size: 14px;
-  }
-
-  .primary-button,
-  .secondary-button {
-    padding: 6px 12px;
-    font-size: 12px;
-  }
+.dark .step-title,
+.dark .register-title {
+  color: var(--color-text);
 }
 
-/* Mejoras para dispositivos táctiles */
-@media (pointer: coarse) {
-  .primary-button,
-  .secondary-button,
-  .form-link {
-    min-height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    touch-action: manipulation;
-  }
-
-  .form-input,
-  .form-select {
-    min-height: 44px;
-    touch-action: manipulation;
-  }
-
-  /* Evitar zoom en inputs en iOS */
-  .form-input,
-  .form-select {
-    font-size: 16px;
-  }
+.dark .branch-card {
+  background: var(--surface);
+  border-color: var(--border-light);
 }
 
-/* Estilos adicionales para componentes */
-.back-button {
-  align-self: flex-start;
-  background: transparent;
-  border: 1px solid rgba(0,0,0,0.12);
-  color: #555;
-  font-weight: 600;
-  margin-bottom: 20px;
-  cursor: pointer;
-  padding: 8px 12px;
-  border-radius: 10px;
-  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+.dark .branch-name {
+  color: var(--color-text);
 }
 
-.back-button svg { stroke: currentColor; }
-
-.back-button:hover {
-  background: rgba(0,0,0,0.06);
-  border-color: rgba(0,0,0,0.2);
+.dark .register-form-wrapper {
+  background: var(--surface);
 }
 
-.forgot-button {
-  background: linear-gradient(90deg, #d9a7c7 0%, #9d7be7 100%);
-  color: white;
-  border: none;
-  border-radius: 10px;
-  padding: 8px 16px;
-  margin: 10px 0;
-  font-weight: bold;
-  cursor: pointer;
-  transition: transform 0.3s;
-  font-size: 12px;
-  width: auto;
-  align-self: center;
+.dark .input {
+  background: var(--bg-input);
+  border-color: var(--border-light);
+  color: var(--color-text);
 }
 
-.forgot-button:hover {
-  transform: translateY(-1px);
+.dark .input::placeholder {
+  color: var(--color-muted);
 }
 
-.form-actions {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 15px;
+.dark .message.error {
+  background: rgba(231, 76, 60, 0.15);
+  border-color: #FF6B5A;
+  color: #FF6B5A;
 }
 
-.welcome-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  margin-top: 30px;
-  width: 100%;
-  max-width: 300px;
-}
-
-.theme-toggle-container {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  z-index: 1000;
-}
-
-.regresar-container {
-  display: flex;
-  align-items: center;
-  margin-bottom: 18px;
-}
-
-.login-title {
-  margin-top: 0;
-  margin-bottom: 28px;
-  text-align: center;
-}
-
-.olvidar-btn {
-  background: linear-gradient(90deg, #d9a7c7 0%, #9d7be7 100%);
-  color: white;
-  border: none;
-  border-radius: 18px;
-  padding: 12px 32px;
-  font-size: 16px;
-  font-weight: bold;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  margin: 0 auto 18px auto;
-  display: block;
-  text-align: center;
-  transition: background 0.3s;
-}
-
-.regresar-btn {
-  background: transparent;
-  color: #555;
-  border: 1px solid rgba(0,0,0,0.12);
-  border-radius: 10px;
-  padding: 8px 10px;
-  font-size: 14px;
-  font-weight: 600;
-  box-shadow: none;
-  margin-right: 8px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-}
-
-.regresar-btn svg { stroke: currentColor; }
-
-.regresar-btn:hover {
-  background: rgba(0,0,0,0.06);
-  border-color: rgba(0,0,0,0.2);
-}
-
-.login-main-container.dark .regresar-btn {
-  color: #ddd;
-  border-color: rgba(255,255,255,0.18);
-}
-
-.login-main-container.dark .regresar-btn:hover {
-  background: rgba(255,255,255,0.08);
-  border-color: rgba(255,255,255,0.28);
-}
-
-/* Dark mode for back-button */
-.login-main-container.dark .back-button {
-  background: transparent;
-  border-color: rgba(255,255,255,0.18);
-  color: #ddd;
-}
-
-.login-main-container.dark .back-button:hover {
-  background: rgba(255,255,255,0.08);
-  border-color: rgba(255,255,255,0.28);
+.dark .message.success {
+  background: rgba(39, 174, 96, 0.15);
+  border-color: #3FC671;
+  color: #3FC671;
 }
