@@ -7,11 +7,11 @@ import '../estilos/LoginPage.css';
 
 // Datos de sucursales de ejemplo
 const SUCURSALES = [
-  { id: 1, name: 'Cesantoni Centro', location: 'Ciudad de México, CDMX', icon: '🏢' },
-  { id: 2, name: 'Cesantoni Polanco', location: 'Polanco, CDMX', icon: '🏬' },
-  { id: 3, name: 'Cesantoni Santa Fe', location: 'Santa Fe, CDMX', icon: '🏪' },
-  { id: 4, name: 'Cesantoni Guadalajara', location: 'Guadalajara, Jalisco', icon: '🏠' },
-  { id: 5, name: 'Cesantoni Monterrey', location: 'Monterrey, Nuevo León', icon: '🏗️' },
+  { id: 1, name: 'Cesantoni Centro', location: 'Ciudad de México, CDMX' },
+  { id: 2, name: 'Cesantoni Polanco', location: 'Polanco, CDMX' },
+  { id: 3, name: 'Cesantoni Santa Fe', location: 'Santa Fe, CDMX' },
+  { id: 4, name: 'Cesantoni Guadalajara', location: 'Guadalajara, Jalisco' },
+  { id: 5, name: 'Cesantoni Monterrey', location: 'Monterrey, Nuevo León' },
 ];
 
 const LoginPage = () => {
@@ -39,7 +39,7 @@ const LoginPage = () => {
   const [registerEmail, setRegisterEmail] = useState('');
   const [registerPassword, setRegisterPassword] = useState('');
   const [registerConfirmPassword, setRegisterConfirmPassword] = useState('');
-  const [acceptTerms, setAcceptTerms] = useState(false);
+  // const [acceptTerms, setAcceptTerms] = useState(false); // Ya no se usa
 
   const { login, register, isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -116,10 +116,12 @@ const LoginPage = () => {
       return;
     }
 
+    /*
     if (!acceptTerms) {
       setMessage('Debes aceptar los términos y condiciones');
       return;
     }
+    */
 
     if (registerPassword.length < 8) {
       setMessage('La contraseña debe tener al menos 8 caracteres');
@@ -173,7 +175,7 @@ const LoginPage = () => {
       setRegisterEmail('');
       setRegisterPassword('');
       setRegisterConfirmPassword('');
-      setAcceptTerms(false);
+      // setAcceptTerms(false);
       
       setTimeout(() => {
         setView('login');
@@ -251,7 +253,6 @@ const LoginPage = () => {
                       className={`branch-card ${selectedBranch?.id === branch.id ? 'selected' : ''}`}
                       onClick={() => setSelectedBranch(branch)}
                     >
-                      <span className="branch-card-icon">{branch.icon}</span>
                       <div className="branch-card-info">
                         <p className="branch-name">{branch.name}</p>
                         <p className="branch-location">{branch.location}</p>
@@ -315,18 +316,20 @@ const LoginPage = () => {
                       type="button" 
                       className="btn-toggle-password"
                       onClick={() => setShowPassword(!showPassword)}
+                      title={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                     >
-                      {showPassword ? '🙈' : '👁️'}
+                      {showPassword ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: '20px', height: '20px' }}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                        </svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: '20px', height: '20px' }}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                      )}
                     </button>
                   </div>
-                </div>
-
-                <div className="form-group-inline">
-                  <label className="checkbox-label">
-                    <input type="checkbox" />
-                    <span>Recordarme en este dispositivo</span>
-                  </label>
-                  <button type="button" className="link-forgot">Olvidé mi contraseña</button>
                 </div>
 
                 <button 
@@ -371,7 +374,6 @@ const LoginPage = () => {
                       type="text" 
                       id="name" 
                       className="input" 
-                      placeholder="Juan"
                       value={registerFirstName}
                       onChange={(e) => setRegisterFirstName(e.target.value)}
                       required
@@ -384,7 +386,6 @@ const LoginPage = () => {
                       type="text" 
                       id="lastname" 
                       className="input" 
-                      placeholder="Pérez García"
                       value={registerLastName}
                       onChange={(e) => setRegisterLastName(e.target.value)}
                       required
@@ -464,8 +465,18 @@ const LoginPage = () => {
                         type="button" 
                         className="btn-toggle-password"
                         onClick={() => setShowPassword(!showPassword)}
+                        title={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                       >
-                        {showPassword ? '🙈' : '👁️'}
+                        {showPassword ? (
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: '20px', height: '20px' }}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                          </svg>
+                        ) : (
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: '20px', height: '20px' }}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                        )}
                       </button>
                     </div>
                     <small className="form-hint">Mínimo 8 caracteres</small>
@@ -487,23 +498,21 @@ const LoginPage = () => {
                         type="button" 
                         className="btn-toggle-password"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        title={showConfirmPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                       >
-                        {showConfirmPassword ? '🙈' : '👁️'}
+                        {showConfirmPassword ? (
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: '20px', height: '20px' }}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                          </svg>
+                        ) : (
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: '20px', height: '20px' }}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                        )}
                       </button>
                     </div>
                   </div>
-                </div>
-
-                <div className="form-group">
-                  <label className="checkbox-label">
-                    <input 
-                      type="checkbox" 
-                      checked={acceptTerms}
-                      onChange={(e) => setAcceptTerms(e.target.checked)}
-                      required
-                    />
-                    <span>Acepto los <button type="button" className="link-terms">términos y condiciones</button></span>
-                  </label>
                 </div>
 
                 <button 

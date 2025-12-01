@@ -215,11 +215,6 @@
   background: rgba(184, 152, 95, 0.15);
 }
 
-.branch-card-icon {
-  font-size: 2rem;
-  flex-shrink: 0;
-}
-
 .branch-card-info {
   flex: 1;
 }
@@ -304,35 +299,8 @@
   opacity: 1;
 }
 
-.form-group-inline {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.875rem;
-  color: var(--color-text);
-  cursor: pointer;
-}
-
-.checkbox-label input[type="checkbox"] {
-  cursor: pointer;
-  width: 18px;
-  height: 18px;
-  accent-color: var(--color-primary);
-}
-
-.link-forgot,
 .link-register,
-.link-login,
-.link-terms {
+.link-login {
   background: none;
   border: none;
   font-size: 0.875rem;
@@ -343,10 +311,8 @@
   padding: 0;
 }
 
-.link-forgot:hover,
 .link-register:hover,
-.link-login:hover,
-.link-terms:hover {
+.link-login:hover {
   text-decoration: underline;
 }
 
