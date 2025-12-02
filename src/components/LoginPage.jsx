@@ -116,11 +116,16 @@ const LoginPage = () => {
       return;
     }
 
+    if (!selectedBranch) {
+      setMessage('Por favor selecciona una sucursal antes de iniciar sesión');
+      return;
+    }
+
     setLoading(true);
     setMessage('');
     
     try {
-      await login(loginUsername, loginPassword);
+      await login(loginUsername, loginPassword, selectedBranch.id);
       setMessage('¡Inicio de sesión exitoso!');
     } catch (err) {
       const errorMsg = err.response?.data?.detail || 'Error al iniciar sesión. Verifica tus credenciales.';

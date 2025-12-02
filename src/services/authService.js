@@ -39,10 +39,11 @@ class AuthService {
   }
 
   // Login
-  async login(username, password) {
+  async login(username, password, sucursalId) {
     const response = await axios.post(`${AUTH_API}/login/`, {
       username,
-      password
+      password,
+      sucursal_id: sucursalId
     });
     
     const { access, refresh, user } = response.data;

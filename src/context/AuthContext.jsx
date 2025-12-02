@@ -25,8 +25,8 @@ export const AuthProvider = ({ children }) => {
     initAuth();
   }, []);
 
-  const login = async (username, password) => {
-    const data = await authService.login(username, password);
+  const login = async (username, password, sucursalId) => {
+    const data = await authService.login(username, password, sucursalId);
     setUser(data.user);
     return data;
   };
