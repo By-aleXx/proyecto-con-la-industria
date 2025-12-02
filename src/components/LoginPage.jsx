@@ -186,11 +186,13 @@ const LoginPage = () => {
     
     try {
       await register({
-        username: registerEmail.split('@')[0],
+        username: registerEmail,  // Usamos el email como username
         email: registerEmail,
         password: registerPassword,
         first_name: registerFirstName,
-        last_name: registerLastName
+        last_name: registerLastName,
+        phone: `${registerCountryCode}${registerPhone}`,
+        birthdate: registerBirthdate
       });
       
       setMessage('¡Registro exitoso! Ahora puedes iniciar sesión.');
