@@ -147,7 +147,7 @@ const MainMenu = () => {
         </div>
         
         <div className="header-logo">
-          <span className="logo-text">CESANTONI</span>
+          <img src="/Logo-Cesantoni.svg" alt="Cesantoni" className="logo-image" />
         </div>
         
         <div className="header-right">

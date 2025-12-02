@@ -21,6 +21,7 @@
   align-items: center;
   background: var(--surface);
   border-bottom: 1px solid var(--border-light);
+  min-height: 70px;
 }
 
 .header-left {
@@ -33,14 +34,21 @@
   flex: 1;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
-.logo-text {
-  font-size: 1.5rem;
-  font-weight: 300;
-  letter-spacing: 4px;
-  color: var(--color-primary);
-  text-transform: uppercase;
+.logo-image {
+  height: 50px;
+  width: auto;
+  object-fit: contain;
+  /* Forzar negro en modo claro */
+  filter: brightness(0);
+  transition: filter 0.3s ease;
+}
+
+.dark .logo-image {
+  /* Forzar blanco en modo oscuro */
+  filter: brightness(0) invert(1);
 }
 
 .header-right {

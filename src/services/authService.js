@@ -128,6 +128,12 @@ class AuthService {
     localStorage.setItem('user', JSON.stringify(response.data));
     return response.data;
   }
+
+  // Obtener lista de sucursales
+  async getSucursales() {
+    const response = await axios.get(`${API_BASE_URL}/sucursales/`);
+    return response.data;
+  }
 }
 
 const authServiceInstance = new AuthService();

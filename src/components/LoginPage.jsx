@@ -1,18 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import anime from 'animejs';
+import Select from 'react-select';
 import { useAuth } from '../context/AuthContext';
+import authService from '../services/authService';
 import '../estilos/index.css';
 import '../estilos/LoginPage.css';
-
-// Datos de sucursales de ejemplo
-const SUCURSALES = [
-  { id: 1, name: 'Cesantoni Centro', location: 'Ciudad de México, CDMX' },
-  { id: 2, name: 'Cesantoni Polanco', location: 'Polanco, CDMX' },
-  { id: 3, name: 'Cesantoni Santa Fe', location: 'Santa Fe, CDMX' },
-  { id: 4, name: 'Cesantoni Guadalajara', location: 'Guadalajara, Jalisco' },
-  { id: 5, name: 'Cesantoni Monterrey', location: 'Monterrey, Nuevo León' },
-];
 
 const LoginPage = () => {
   const [view, setView] = useState('login'); // 'login' | 'register'
@@ -22,7 +15,9 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
-  // Sucursal seleccionada
+  // Sucursales y selección
+  const [sucursales, setSucursales] = useState([]);
+  const [loadingBranches, setLoadingBranches] = useState(true);
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   
@@ -69,6 +64,22 @@ const LoginPage = () => {
     });
   }, [view, isDark]);
 
+  useEffect(() => {
+    const fetchSucursales = async () => {
+      try {
+        setLoadingBranches(true);
+        const data = await authService.getSucursales();
+        setSucursales(data);
+      } catch (error) {
+        console.error('Error al cargar sucursales:', error);
+      } finally {
+        setLoadingBranches(false);
+      }
+    };
+
+    fetchSucursales();
+  }, []);
+
   const toggleTheme = () => {
     const next = !isDark;
     setIsDark(next);
@@ -80,10 +91,22 @@ const LoginPage = () => {
     }
   };
 
-  const filteredBranches = SUCURSALES.filter(branch => 
-    branch.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    branch.location.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredBranches = sucursales.filter(branch => 
+    branch.nombre.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const branchOptions = useMemo(() => 
+    sucursales.map(branch => ({
+      value: branch.id,
+      label: branch.nombre,
+    })), 
+    [sucursales]
+  );
+
+  const selectedBranchOption = useMemo(() => {
+    if (!selectedBranch) return null;
+    return branchOptions.find(option => option.value === selectedBranch.id) || null;
+  }, [selectedBranch, branchOptions]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -202,14 +225,40 @@ const LoginPage = () => {
 
   return (
     <div className={`cesantoni-container ${isDark ? 'dark' : 'light'}`}>
+      {/* Theme Toggle Button - Fijo en móvil */}
+      <button 
+        className="theme-toggle-mobile"
+        onClick={toggleTheme}
+        aria-label={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+        title={isDark ? 'Modo claro' : 'Modo oscuro'}
+      >
+        {isDark ? (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        ) : (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        )}
+      </button>
+
       {/* Header */}
       <header className="cesantoni-header">
         <div className="header-logo">
-          <span className="logo-text">CESANTONI</span>
+          <img src="/Logo-Cesantoni.svg" alt="Cesantoni" className="logo-image" />
         </div>
         
-        {/* Theme Toggle Switch */}
-        <div className="theme-toggle">
+        {/* Theme Toggle Switch - visible en desktop */}
+        <div className="theme-toggle theme-toggle-desktop">
           <label className="switch" title={isDark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}>
             <input 
               type="checkbox" 
@@ -233,41 +282,73 @@ const LoginPage = () => {
               <h1 className="step-title">Selecciona tu sucursal</h1>
               <p className="step-subtitle">Elige la tienda donde trabajarás hoy</p>
 
-              {/* Buscador */}
-              <div className="search-box">
+              {/* Buscador - Desktop */}
+              <div className="search-box search-box-desktop">
                 <input 
                   type="text" 
                   className="input search-input" 
-                  placeholder="Busca tu tienda por ciudad, estado o nombre"
+                  placeholder="Busca tu tienda"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
 
-              {/* Sucursales disponibles */}
-              <div className="branch-section">
+              {/* Select - Mobile */}
+              <div className="search-box search-box-mobile">
+                <Select
+                  className="branch-select"
+                  classNamePrefix="branch-select"
+                  placeholder="Busca tu tienda"
+                  options={branchOptions}
+                  value={selectedBranchOption}
+                  onChange={(option) => {
+                    if (option) {
+                      const branch = sucursales.find(s => s.id === option.value);
+                      if (branch) {
+                        setSelectedBranch(branch);
+                        setSearchTerm('');
+                      }
+                    } else {
+                      setSelectedBranch(null);
+                    }
+                  }}
+                  isLoading={loadingBranches}
+                  isClearable
+                  isSearchable
+                  noOptionsMessage={() => 'Sin coincidencias'}
+                  loadingMessage={() => 'Cargando...'}
+                />
+              </div>
+
+              {/* Sucursales disponibles - Solo Desktop */}
+              <div className="branch-section branch-section-desktop">
                 <div className="branch-list">
-                  {filteredBranches.map((branch) => (
-                    <div 
-                      key={branch.id}
-                      className={`branch-card ${selectedBranch?.id === branch.id ? 'selected' : ''}`}
-                      onClick={() => setSelectedBranch(branch)}
-                    >
-                      <div className="branch-card-info">
-                        <p className="branch-name">{branch.name}</p>
-                        <p className="branch-location">{branch.location}</p>
-                      </div>
-                      <button 
-                        className="btn-select-branch"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedBranch(branch);
-                        }}
+                  {loadingBranches ? (
+                    <div className="loading-message">Cargando sucursales...</div>
+                  ) : filteredBranches.length > 0 ? (
+                    filteredBranches.map((branch) => (
+                      <div 
+                        key={branch.id}
+                        className={`branch-card ${selectedBranch?.id === branch.id ? 'selected' : ''}`}
+                        onClick={() => setSelectedBranch(branch)}
                       >
-                        Seleccionar
-                      </button>
-                    </div>
-                  ))}
+                        <div className="branch-card-info">
+                          <p className="branch-name">{branch.nombre}</p>
+                        </div>
+                        <button 
+                          className="btn-select-branch"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedBranch(branch);
+                          }}
+                        >
+                          Seleccionar
+                        </button>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="empty-message">No se encontraron sucursales</div>
+                  )}
                 </div>
               </div>
             </div>
@@ -293,7 +374,7 @@ const LoginPage = () => {
                     type="text" 
                     id="username" 
                     className="input" 
-                    placeholder="ingresa tu usuario@cesantoni.com"
+                    placeholder="Ingresa tu usuario o correo"
                     value={loginUsername}
                     onChange={(e) => setLoginUsername(e.target.value)}
                     required

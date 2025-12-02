@@ -3,6 +3,9 @@
 /* ========== CONTENEDOR PRINCIPAL ========== */
 .cesantoni-container {
   min-height: 100vh;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   background: var(--bg);
@@ -15,31 +18,94 @@
 
 /* ========== HEADER ========== */
 .cesantoni-header {
-  padding: 24px 32px;
+  padding: 16px 32px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   background: var(--surface);
   border-bottom: 1px solid var(--border-light);
+  min-height: 70px;
+  gap: 16px;
 }
 
 .header-logo {
   display: flex;
   align-items: center;
+  flex: 1;
+  min-width: 0;
 }
 
-.logo-text {
-  font-size: 1.8rem;
-  font-weight: 300;
-  letter-spacing: 4px;
-  color: var(--color-primary);
-  text-transform: uppercase;
+.logo-image {
+  height: 55px;
+  width: auto;
+  max-width: 100%;
+  flex-shrink: 1;
+  /* Forzar negro en modo claro */
+  filter: brightness(0);
+  transition: filter 0.3s ease;
+}
+
+.dark .logo-image {
+  /* Forzar blanco en modo oscuro */
+  filter: brightness(0) invert(1);
 }
 
 /* ========== THEME TOGGLE SWITCH ========== */
 .theme-toggle {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
+}
+
+/* Toggle desktop (switch) - visible por defecto */
+.theme-toggle-desktop {
+  display: flex;
+}
+
+/* Toggle móvil (botón circular) - oculto por defecto */
+.theme-toggle-mobile {
+  display: none;
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: var(--color-primary);
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.theme-toggle-mobile:hover {
+  background: var(--color-primary-dark);
+  transform: scale(1.05);
+}
+
+.theme-toggle-mobile:active {
+  transform: scale(0.95);
+}
+
+.dark .theme-toggle-mobile {
+  background: var(--color-primary);
+  color: #FFD700;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* En pantallas medianas y pequeñas: mostrar botón circular, ocultar switch */
+@media (max-width: 968px) {
+  .theme-toggle-desktop {
+    display: none !important;
+  }
+  
+  .theme-toggle-mobile {
+    display: flex !important;
+  }
 }
 
 .switch {
@@ -163,6 +229,16 @@
   margin-bottom: 32px;
 }
 
+/* Buscador desktop - visible por defecto */
+.search-box-desktop {
+  display: block;
+}
+
+/* Select móvil - oculto por defecto */
+.search-box-mobile {
+  display: none;
+}
+
 .search-input {
   width: 100%;
   font-size: 0.95rem;
@@ -176,6 +252,88 @@
   font-weight: 300;
 }
 
+.search-select {
+  width: 100%;
+  font-size: 0.95rem;
+  padding: 14px 20px;
+  border: 2px solid var(--border-light);
+  background: var(--surface);
+  color: var(--color-text);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238B6F47' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 45px;
+}
+
+.search-select:focus {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+.search-select option {
+  padding: 10px;
+  background: var(--surface);
+  color: var(--color-text);
+}
+
+/* React Select styles */
+.branch-select {
+  font-size: 0.95rem;
+}
+
+.branch-select__control {
+  border: 2px solid var(--border-light) !important;
+  background: var(--surface) !important;
+  border-radius: var(--radius) !important;
+  min-height: 52px !important;
+  box-shadow: none !important;
+}
+
+.branch-select__control--is-focused {
+  border-color: var(--color-primary) !important;
+}
+
+.branch-select__single-value {
+  color: var(--color-text) !important;
+}
+
+.branch-select__placeholder {
+  color: var(--color-muted) !important;
+}
+
+.branch-select__menu {
+  background: var(--surface) !important;
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+  z-index: var(--z-dropdown);
+}
+
+.branch-select__option {
+  cursor: pointer !important;
+  color: var(--color-text) !important;
+}
+
+.branch-select__option--is-focused,
+.branch-select__option--is-selected {
+  background: rgba(139, 111, 71, 0.15) !important;
+}
+
+.branch-select__indicator-separator {
+  display: none;
+}
+
+.branch-select__clear-indicator,
+.branch-select__dropdown-indicator {
+  color: var(--color-primary) !important;
+}
+
+.branch-select__clear-indicator:hover,
+.branch-select__dropdown-indicator:hover {
+  color: var(--color-primary-dark) !important;
+}
+
 /* ========== TARJETAS DE SUCURSAL ========== */
 .branch-section {
   margin-bottom: 32px;
@@ -187,6 +345,14 @@
   gap: 12px;
   max-height: 400px;
   overflow-y: auto;
+}
+
+.loading-message,
+.empty-message {
+  text-align: center;
+  padding: 20px;
+  color: var(--color-muted);
+  font-size: 0.9rem;
 }
 
 .branch-card {
@@ -483,6 +649,20 @@
   .phone-group {
     grid-column: 1;
   }
+
+  /* Ocultar input de búsqueda y tarjetas en móvil */
+  .search-box-desktop {
+    display: none;
+  }
+
+  .branch-section-desktop {
+    display: none;
+  }
+
+  /* Mostrar select en móvil */
+  .search-box-mobile {
+    display: block;
+  }
 }
 
 @media (max-width: 768px) {
@@ -539,29 +719,28 @@
 @media (max-width: 480px) {
   .cesantoni-header {
     padding: 12px 16px;
+    min-height: 60px;
+    gap: 12px;
   }
 
-  .logo-text {
-    font-size: 1.2rem;
-    letter-spacing: 2px;
+  .header-logo {
+    flex: 1;
+    min-width: 0;
   }
 
-  .switch {
-    width: 50px;
-    height: 26px;
+  .logo-image {
+    height: 45px;
+    max-width: 100%;
   }
 
-  .slider::before {
-    height: 16px;
-    width: 16px;
+  .theme-toggle-mobile {
+    width: 36px;
+    height: 36px;
   }
 
-  .switch input:checked + .slider::before {
-    transform: translateX(22px);
-  }
-
-  .slider .icon {
-    font-size: 12px;
+  .theme-toggle-mobile svg {
+    width: 18px;
+    height: 18px;
   }
 
   .unified-view,
@@ -646,6 +825,46 @@
 
 .dark .input::placeholder {
   color: var(--color-muted);
+}
+
+.dark .search-select {
+  background-color: var(--bg-input);
+  border-color: var(--border-light);
+  color: var(--color-text);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23B8985F' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+}
+
+.dark .search-select option {
+  background: var(--bg-input);
+  color: var(--color-text);
+}
+
+.dark .branch-select__control {
+  background: var(--bg-input) !important;
+  border-color: var(--border-light) !important;
+}
+
+.dark .branch-select__menu {
+  background: var(--surface) !important;
+  border-color: var(--border-light);
+}
+
+.dark .branch-select__option--is-focused,
+.dark .branch-select__option--is-selected {
+  background: rgba(184, 152, 95, 0.25) !important;
+}
+
+.dark .branch-select__placeholder {
+  color: var(--color-muted) !important;
+}
+
+.dark .branch-select__single-value {
+  color: var(--color-text) !important;
+}
+
+.dark .branch-select__clear-indicator,
+.dark .branch-select__dropdown-indicator {
+  color: #FFD700 !important;
 }
 
 .dark .message.error {
