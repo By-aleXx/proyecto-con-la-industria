@@ -120,6 +120,68 @@
   color: white;
 }
 
+/* Botón de volver al listado */
+.back-to-list-button {
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.back-to-list-button:hover {
+  background: var(--bg);
+  color: var(--color-primary);
+}
+
+/* Info del cliente en el header del chat */
+.chat-cliente-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.chat-cliente-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chat-cliente-phone {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+
+/* Loading historial */
+.chat-loading-history {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 40px;
+}
+
+.chat-loading-history .loading-text {
+  font-size: 0.95rem;
+  color: var(--color-muted);
+  margin: 0;
+}
+
 /* Botón de configuración */
 .settings-button {
   width: 44px;
@@ -719,6 +781,14 @@
   .chat-header {
     padding: 16px 20px;
   }
+
+  .back-to-list-button {
+    margin-right: 8px;
+  }
+
+  .chat-cliente-name {
+    font-size: 1rem;
+  }
 }
 
 @media (max-width: 768px) {
@@ -873,6 +943,24 @@
     width: 36px;
     height: 36px;
     padding: 6px;
+  }
+
+  .back-to-list-button {
+    width: 36px;
+    height: 36px;
+    margin-right: 6px;
+  }
+
+  .chat-cliente-info {
+    max-width: calc(100vw - 160px);
+  }
+
+  .chat-cliente-name {
+    font-size: 0.95rem;
+  }
+
+  .chat-cliente-phone {
+    font-size: 0.75rem;
   }
 
   .chat-container {

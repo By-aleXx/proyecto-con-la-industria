@@ -49,7 +49,7 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/chat');
+      navigate('/conversaciones');
     }
   }, [isAuthenticated, navigate]);
 

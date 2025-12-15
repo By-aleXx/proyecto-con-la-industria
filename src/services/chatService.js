@@ -2,16 +2,25 @@ import apiClient from './axiosInterceptor';
 import { v4 as uuidv4 } from 'uuid';
 
 class ChatService {
-  // Enviar mensaje
-  async sendMessage(mensaje, sessionId = null, historial = []) {
-    // Si no hay sessionId, generar uno nuevo
+  // Enviar mensaje con nombre y teléfono opcionales
+  async sendMessage(mensaje, sessionId = null, historial = [], clienteInfo = {}) {
     const finalSessionId = sessionId || uuidv4();
 
-    const response = await apiClient.post('/chat/', {
+    const body = {
       mensaje,
       session_id: finalSessionId,
       historial
-    });
+    };
+
+    // Agregar nombre y teléfono solo si se proporcionan
+    if (clienteInfo.nombre) {
+      body.nombre = clienteInfo.nombre;
+    }
+    if (clienteInfo.telefono) {
+      body.telefono = clienteInfo.telefono;
+    }
+
+    const response = await apiClient.post('/chat/', body);
 
     return {
       ...response.data,
@@ -19,22 +28,20 @@ class ChatService {
     };
   }
 
-  // Obtener historial de conversación
+  // Obtener historial de conversación (incluye sesion_detalle)
   async getHistorial(sessionId = null) {
     const params = sessionId ? { session_id: sessionId } : {};
     const response = await apiClient.get('/chat/historial/', { params });
     return response.data;
   }
 
-  // Listar sesiones
-  async getSessions() {
-    const response = await apiClient.get('/chat/sessions/');
-    return response.data;
-  }
-
-  // Crear nueva sesión
-  async createSession(titulo = 'Nueva conversación') {
-    const response = await apiClient.post('/chat/sessions/', { titulo });
+  // Listar sesiones/conversaciones (NUEVO endpoint)
+  async getSesiones(query = '', limit = 50) {
+    const params = {};
+    if (query) params.q = query;
+    if (limit) params.limit = limit;
+    
+    const response = await apiClient.get('/chat/sesiones/', { params });
     return response.data;
   }
 
@@ -52,8 +59,23 @@ class ChatService {
   clearCurrentSessionId() {
     localStorage.removeItem('currentSessionId');
   }
+
+  // Guardar información del cliente actual
+  setCurrentClienteInfo(clienteInfo) {
+    localStorage.setItem('currentClienteInfo', JSON.stringify(clienteInfo));
+  }
+
+  // Obtener información del cliente actual
+  getCurrentClienteInfo() {
+    const info = localStorage.getItem('currentClienteInfo');
+    return info ? JSON.parse(info) : null;
+  }
+
+  // Limpiar información del cliente
+  clearCurrentClienteInfo() {
+    localStorage.removeItem('currentClienteInfo');
+  }
 }
 
 const chatServiceInstance = new ChatService();
 export default chatServiceInstance;
-
