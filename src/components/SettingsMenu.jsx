@@ -37,7 +37,19 @@ const SettingsMenu = ({ onLogout, onChangePassword, onToggle, isDark, open: exte
     };
   }, [open, setOpen]);
 
-  // Render only the dropdown; the trigger button is expected to be external (e.g., ThemeToggle)
+  // Colores Cesantoni
+  const colors = {
+    primary: isDark ? '#B8985F' : '#8B6F47',
+    primaryDark: isDark ? '#9A7F4F' : '#6D5738',
+    accent: isDark ? '#C0A080' : '#A0826D',
+    surface: isDark ? '#2C2C2C' : '#ffffff',
+    border: isDark ? '#404040' : '#D4CFC8',
+    text: isDark ? '#E8E4E0' : '#333333',
+    textMuted: isDark ? '#999999' : '#757575',
+    error: isDark ? '#FF6B5A' : '#E74C3C',
+    errorBg: isDark ? 'rgba(255, 107, 90, 0.15)' : 'rgba(231, 76, 60, 0.1)'
+  };
+
   return (
     <div ref={menuRef} style={{ position: 'relative', display: 'inline-block', zIndex: 1200 }}>
       {open && (
@@ -45,16 +57,19 @@ const SettingsMenu = ({ onLogout, onChangePassword, onToggle, isDark, open: exte
           role="menu"
           aria-label="Menú de configuración"
           style={{
-          position: 'absolute',
-          top: '30px',
-          right: 0,
-          background: isDark ? '#2b2b2b' : '#fff',
-          color: isDark ? '#fff' : '#111',
-          borderRadius: 8,
-          boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-          minWidth: 200,
-          overflow: 'hidden'
-        }}>
+            position: 'absolute',
+            top: '50px',
+            right: 0,
+            background: colors.surface,
+            color: colors.text,
+            borderRadius: '8px',
+            boxShadow: isDark 
+              ? '0 8px 24px rgba(0,0,0,0.4)' 
+              : '0 8px 24px rgba(0,0,0,0.12)',
+            border: `1px solid ${colors.border}`,
+            minWidth: 220,
+            overflow: 'hidden'
+          }}>
           {onToggle && (
             <button
               type="button"
@@ -67,31 +82,33 @@ const SettingsMenu = ({ onLogout, onChangePassword, onToggle, isDark, open: exte
               onMouseLeave={() => setThemeHover(false)}
               style={{
                 width: '100%',
-                padding: '10px 14px',
+                padding: '12px 16px',
                 background: themeHover
-                  ? (isDark ? 'rgba(108,92,231,0.28)' : 'rgba(108,92,231,0.18)')
-                  : (isDark ? 'transparent' : 'transparent'),
-                color: isDark ? (themeHover ? '#fff' : '#d6d6fb') : (themeHover ? '#3a2d7a' : '#6c5ce7'),
+                  ? (isDark ? 'rgba(184, 152, 95, 0.15)' : 'rgba(139, 111, 71, 0.08)')
+                  : 'transparent',
+                color: themeHover ? colors.primary : colors.text,
                 border: 'none',
                 textAlign: 'left',
                 cursor: 'pointer',
-                transition: 'background 120ms ease, color 120ms ease',
-                fontWeight: 600,
-                borderBottom: isDark ? '1px solid #444' : '1px solid #eee',
+                transition: 'all 0.2s ease',
+                fontWeight: 500,
+                fontSize: '0.9rem',
+                borderBottom: `1px solid ${colors.border}`,
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px'
+                gap: '12px'
               }}
             >
               <svg 
-                width="16" 
-                height="16" 
+                width="18" 
+                height="18" 
                 viewBox="0 0 24 24" 
                 fill="none" 
                 stroke="currentColor" 
                 strokeWidth="2" 
                 strokeLinecap="round" 
                 strokeLinejoin="round"
+                style={{ color: colors.primary }}
               >
                 {isDark ? (
                   // Sol
@@ -127,31 +144,33 @@ const SettingsMenu = ({ onLogout, onChangePassword, onToggle, isDark, open: exte
               onMouseLeave={() => setChangePasswordHover(false)}
               style={{
                 width: '100%',
-                padding: '10px 14px',
+                padding: '12px 16px',
                 background: changePasswordHover
-                  ? (isDark ? 'rgba(52,152,219,0.28)' : 'rgba(52,152,219,0.18)')
-                  : (isDark ? 'transparent' : 'transparent'),
-                color: isDark ? (changePasswordHover ? '#fff' : '#d6eefb') : (changePasswordHover ? '#063852' : '#155a8a'),
+                  ? (isDark ? 'rgba(184, 152, 95, 0.15)' : 'rgba(139, 111, 71, 0.08)')
+                  : 'transparent',
+                color: changePasswordHover ? colors.primary : colors.text,
                 border: 'none',
                 textAlign: 'left',
                 cursor: 'pointer',
-                transition: 'background 120ms ease, color 120ms ease',
-                fontWeight: 600,
-                borderBottom: isDark ? '1px solid #444' : '1px solid #eee',
+                transition: 'all 0.2s ease',
+                fontWeight: 500,
+                fontSize: '0.9rem',
+                borderBottom: `1px solid ${colors.border}`,
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px'
+                gap: '12px'
               }}
             >
               <svg 
-                width="16" 
-                height="16" 
+                width="18" 
+                height="18" 
                 viewBox="0 0 24 24" 
                 fill="none" 
                 stroke="currentColor" 
                 strokeWidth="2" 
                 strokeLinecap="round" 
                 strokeLinejoin="round"
+                style={{ color: colors.primary }}
               >
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
@@ -163,7 +182,6 @@ const SettingsMenu = ({ onLogout, onChangePassword, onToggle, isDark, open: exte
           <button
             type="button"
             onClick={() => { 
-              // Close menu first, then call logout after a short delay so parent navigation can occur
               try { setOpen(false); } catch (e) { /* ignore */ }
               if (typeof onLogout === 'function') {
                 setTimeout(() => onLogout(), 80);
@@ -173,24 +191,23 @@ const SettingsMenu = ({ onLogout, onChangePassword, onToggle, isDark, open: exte
             onMouseLeave={() => setLogoutHover(false)}
             style={{
               width: '100%',
-              padding: '10px 14px',
-              background: logoutHover
-                ? (isDark ? 'rgba(231,76,60,0.28)' : 'rgba(231,76,60,0.18)')
-                : (isDark ? 'transparent' : 'transparent'),
-              color: logoutHover ? '#e74c3c' : (isDark ? '#ff8a80' : '#c0392b'),
+              padding: '12px 16px',
+              background: logoutHover ? colors.errorBg : 'transparent',
+              color: logoutHover ? colors.error : colors.textMuted,
               border: 'none',
               textAlign: 'left',
               cursor: 'pointer',
-              transition: 'background 120ms ease, color 120ms ease',
-              fontWeight: 600,
+              transition: 'all 0.2s ease',
+              fontWeight: 500,
+              fontSize: '0.9rem',
               display: 'flex',
               alignItems: 'center',
-              gap: '10px'
+              gap: '12px'
             }}
           >
             <svg 
-              width="16" 
-              height="16" 
+              width="18" 
+              height="18" 
               viewBox="0 0 24 24" 
               fill="none" 
               stroke="currentColor" 

@@ -4,7 +4,6 @@ import SettingsMenu from './SettingsMenu';
 const ThemeToggle = ({ onToggle, isDark, onLogout, onChangePassword, showGear = true }) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // If the gear is hidden, we don't render the menu trigger or SettingsMenu
   return (
     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
       {showGear && (
@@ -13,24 +12,24 @@ const ThemeToggle = ({ onToggle, isDark, onLogout, onChangePassword, showGear = 
           onClick={() => setMenuOpen(!menuOpen)} 
           aria-label="Abrir configuración" 
           style={{ 
-            background: 'rgba(108, 92, 231, 0.9)',
-            border: 'none',
+            background: 'var(--color-primary)',
+            border: '2px solid var(--color-primary)',
             borderRadius: '50%',
-            padding: '12px',
-            width: '48px',
-            height: '48px',
+            padding: '10px',
+            width: '44px',
+            height: '44px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
-            boxShadow: '0 2px 5px rgba(0,0,0,0.15)',
+            boxShadow: 'var(--shadow-sm)',
             transition: 'all 0.3s ease'
           }}
           title="Configuración"
         >
           <svg 
-            width="20" 
-            height="20" 
+            width="18" 
+            height="18" 
             viewBox="0 0 512 512" 
             fill="#fff"
           >
@@ -44,15 +43,11 @@ const ThemeToggle = ({ onToggle, isDark, onLogout, onChangePassword, showGear = 
           isDark={isDark}
           onToggle={onToggle}
           onLogout={() => {
-            // close the menu first
             setMenuOpen(false);
-            // call parent's logout handler if provided
             if (typeof onLogout === 'function') onLogout();
           }}
           onChangePassword={() => {
-            // close the menu first
             setMenuOpen(false);
-            // call parent's change password handler if provided
             if (typeof onChangePassword === 'function') onChangePassword();
           }}
           open={menuOpen}
