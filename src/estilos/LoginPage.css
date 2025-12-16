@@ -383,6 +383,7 @@
 
 .branch-card-info {
   flex: 1;
+  min-width: 0;
 }
 
 .branch-name {
@@ -390,12 +391,18 @@
   font-weight: 600;
   color: var(--color-secondary);
   margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .branch-location {
   font-size: 0.875rem;
   color: var(--color-muted);
   margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .btn-select-branch {

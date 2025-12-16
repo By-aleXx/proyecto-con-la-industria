@@ -67,6 +67,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .user-icon,
@@ -79,11 +81,19 @@
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .user-sucursal {
   font-size: 0.85rem;
   color: var(--color-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 /* ========== SECCIÓN DE BÚSQUEDA ========== */
@@ -292,6 +302,9 @@
 .conv-phone {
   font-size: 0.85rem;
   color: var(--color-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .conv-preview {

@@ -163,6 +163,9 @@
 .chat-cliente-phone {
   font-size: 0.8rem;
   color: var(--color-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Loading historial */
