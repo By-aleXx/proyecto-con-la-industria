@@ -55,18 +55,64 @@ const ChatRecommendations = () => {
       setIsLoadingHistory(true);
       const historialData = await chatService.getHistorial(sessionIdToLoad);
       
-      if (historialData && Array.isArray(historialData) && historialData.length > 0) {
-        // Convertir historial del backend a formato de mensajes
-        const loadedMessages = historialData.map((msg, index) => ({
-          id: Date.now() + index,
-          type: msg.rol === 'user' ? 'user' : 'ai',
-          text: msg.contenido,
-          timestamp: new Date(msg.fecha_creacion || Date.now()),
-          metadata: msg.metadata
-        }));
+      // El historial puede venir como array directamente o dentro de un objeto
+      let registros = [];
+      if (Array.isArray(historialData)) {
+        registros = historialData;
+      } else if (historialData?.results && Array.isArray(historialData.results)) {
+        registros = historialData.results;
+      }
+      
+      if (registros.length > 0) {
+        // El historial viene ordenado del más reciente al más antiguo, hay que invertirlo
+        const registrosOrdenados = [...registros].reverse();
+        
+        // Cada registro contiene mensaje_usuario y mensaje_asistente juntos
+        // Necesitamos separarlos en mensajes individuales
+        const loadedMessages = [];
+        
+        registrosOrdenados.forEach((registro, index) => {
+          const baseId = Date.now() + (index * 2);
+          const timestamp = new Date(registro.fecha_creacion || Date.now());
+          
+          // Agregar mensaje del usuario
+          if (registro.mensaje_usuario) {
+            loadedMessages.push({
+              id: baseId,
+              type: 'user',
+              text: registro.mensaje_usuario,
+              timestamp: timestamp,
+            });
+          }
+          
+          // Agregar mensaje del asistente
+          if (registro.mensaje_asistente) {
+            loadedMessages.push({
+              id: baseId + 1,
+              type: 'ai',
+              text: registro.mensaje_asistente,
+              timestamp: timestamp,
+              metadata: registro.metadata,
+              productos: registro.productos_recomendados
+            });
+          }
+        });
         
         setMessages(loadedMessages);
         setIsNewConversation(false);
+        
+        // Actualizar info del cliente desde sesion_detalle si está disponible
+        if (registros[0]?.sesion_detalle) {
+          const sesionDetalle = registros[0].sesion_detalle;
+          if (sesionDetalle.nombre || sesionDetalle.telefono) {
+            const clienteFromHistory = {
+              nombre: sesionDetalle.nombre,
+              telefono: sesionDetalle.telefono
+            };
+            setClienteInfo(clienteFromHistory);
+            chatService.setCurrentClienteInfo(clienteFromHistory);
+          }
+        }
       } else {
         // No hay historial, mostrar mensaje de bienvenida
         const cliente = chatService.getCurrentClienteInfo();
