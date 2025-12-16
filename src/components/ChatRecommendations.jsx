@@ -498,7 +498,7 @@ const ChatRecommendations = () => {
                   <div className="ai-message-container">
                     <div className="avatar-circle">
                       <img 
-                        src="/avatar.svg" 
+                        src="/avatar.png" 
                         alt="CesanTony"
                         className="avatar-image"
                         onError={(e) => {
@@ -556,7 +556,7 @@ const ChatRecommendations = () => {
                 <div className="ai-message-container">
                   <div className="avatar-circle">
                     <img 
-                      src="/avatar.svg" 
+                      src="/avatar.png" 
                       alt="CesanTony"
                       className="avatar-image"
                       onError={(e) => {

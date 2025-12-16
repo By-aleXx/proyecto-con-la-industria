@@ -195,7 +195,7 @@ const ChatRecommendations = ({ userName, clientType, selectedArea, selectedSearc
                 <div className="ai-message-container">
                   <div className="avatar-circle">
                     <img 
-                      src="/avatar.svg" 
+                      src="/avatar.png" 
                       alt="Laura"
                       className="avatar-image"
                       onError={(e) => {
