@@ -126,6 +126,8 @@ const LoginPage = () => {
     
     try {
       await login(loginUsername, loginPassword, selectedBranch.id);
+      // Guardar nombre de la sucursal en localStorage
+      localStorage.setItem('sucursal_nombre', selectedBranch.nombre);
       setMessage('¡Inicio de sesión exitoso!');
     } catch (err) {
       const errorMsg = err.response?.data?.detail || 'Error al iniciar sesión. Verifica tus credenciales.';

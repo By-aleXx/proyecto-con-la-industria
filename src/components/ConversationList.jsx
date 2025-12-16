@@ -10,7 +10,7 @@ import '../estilos/index.css';
 import '../estilos/ConversationList.css';
 
 const ConversationList = () => {
-  const { logout, changePassword } = useAuth();
+  const { logout, changePassword, user } = useAuth();
   const navigate = useNavigate();
 
   const [conversations, setConversations] = useState([]);
@@ -20,6 +20,9 @@ const ConversationList = () => {
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [showNewConversation, setShowNewConversation] = useState(false);
   const [error, setError] = useState(null);
+  
+  // Obtener nombre de la sucursal desde localStorage
+  const sucursalNombre = localStorage.getItem('sucursal_nombre') || 'Sucursal';
 
   // Cargar conversaciones
   const loadConversations = useCallback(async (query = '') => {
@@ -166,10 +169,51 @@ const ConversationList = () => {
         </div>
       </header>
 
-      {/* Título y búsqueda */}
+      {/* Info del usuario */}
+      <div className="conv-user-info">
+        <div className="user-info-row">
+          <svg className="user-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span className="user-name">{user?.nombre || user?.username || 'Usuario'}</span>
+        </div>
+        <div className="user-info-row">
+          <svg className="location-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <span className="user-sucursal">{sucursalNombre}</span>
+        </div>
+      </div>
+
+      {/* Barra de búsqueda y botón nueva conversación */}
       <div className="conv-search-section">
-        <div className="conv-title-row">
-          <h1 className="conv-title">Conversaciones</h1>
+        <div className="conv-search-row">
+          <div className="conv-search-container">
+            <svg className="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input
+              type="text"
+              placeholder="Buscar por nombre o teléfono..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="conv-search-input"
+            />
+            {searchQuery && (
+              <button 
+                className="search-clear-btn"
+                onClick={() => setSearchQuery('')}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            )}
+          </div>
           <button 
             className="new-conv-button"
             onClick={() => setShowNewConversation(true)}
@@ -179,33 +223,7 @@ const ConversationList = () => {
               <line x1="12" y1="5" x2="12" y2="19"></line>
               <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
-            <span>Nueva</span>
           </button>
-        </div>
-        
-        <div className="conv-search-container">
-          <svg className="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input
-            type="text"
-            placeholder="Buscar por nombre o teléfono..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="conv-search-input"
-          />
-          {searchQuery && (
-            <button 
-              className="search-clear-btn"
-              onClick={() => setSearchQuery('')}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
-          )}
         </div>
       </div>
 

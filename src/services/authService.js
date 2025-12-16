@@ -25,6 +25,7 @@ class AuthService {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
+    localStorage.removeItem('sucursal_nombre');
   }
 
   // Verificar si está autenticado
