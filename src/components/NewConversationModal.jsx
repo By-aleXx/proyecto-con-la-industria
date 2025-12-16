@@ -4,36 +4,39 @@ import '../estilos/ConversationList.css';
 const NewConversationModal = ({ isOpen, onClose, onConfirm, isDark }) => {
   const [nombre, setNombre] = useState('');
   const [telefono, setTelefono] = useState('');
+  const [countryCode, setCountryCode] = useState('+52');
   const [telefonoError, setTelefonoError] = useState('');
 
   useEffect(() => {
     if (isOpen) {
       setNombre('');
       setTelefono('');
+      setCountryCode('+52');
       setTelefonoError('');
     }
   }, [isOpen]);
 
-  // Validar formato de teléfono: + seguido de 10-15 dígitos
+  // Validar formato de teléfono: solo dígitos, 10 caracteres para México
   const validateTelefono = (value) => {
     if (!value) return true; // Es opcional
-    const regex = /^\+\d{10,15}$/;
-    return regex.test(value);
+    // Limpiar espacios y guiones
+    const cleanValue = value.replace(/[\s-]/g, '');
+    // Validar que sean solo dígitos y tenga entre 10 y 15 caracteres
+    const regex = /^\d{10,15}$/;
+    return regex.test(cleanValue);
   };
 
   const handleTelefonoChange = (e) => {
     let value = e.target.value;
     
-    // Permitir solo + al inicio y números
-    value = value.replace(/[^\d+]/g, '');
-    if (value.indexOf('+') > 0) {
-      value = '+' + value.replace(/\+/g, '');
-    }
+    // Permitir solo números, espacios y guiones
+    value = value.replace(/[^\d\s-]/g, '');
     
     setTelefono(value);
     
-    if (value && !validateTelefono(value)) {
-      setTelefonoError('Formato: +521234567890 (10-15 dígitos)');
+    const cleanValue = value.replace(/[\s-]/g, '');
+    if (cleanValue && !validateTelefono(cleanValue)) {
+      setTelefonoError('Ingresa un número de 10 dígitos');
     } else {
       setTelefonoError('');
     }
@@ -42,20 +45,26 @@ const NewConversationModal = ({ isOpen, onClose, onConfirm, isDark }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    if (telefono && !validateTelefono(telefono)) {
-      setTelefonoError('Formato inválido');
+    const cleanTelefono = telefono.replace(/[\s-]/g, '');
+    
+    if (cleanTelefono && !validateTelefono(cleanTelefono)) {
+      setTelefonoError('Número inválido');
       return;
     }
 
+    // Concatenar código de país + teléfono
+    const telefonoCompleto = cleanTelefono ? `${countryCode}${cleanTelefono}` : null;
+
     onConfirm({
       nombre: nombre.trim() || null,
-      telefono: telefono.trim() || null
+      telefono: telefonoCompleto
     });
   };
 
   const handleClose = () => {
     setNombre('');
     setTelefono('');
+    setCountryCode('+52');
     setTelefonoError('');
     onClose();
   };
@@ -94,14 +103,29 @@ const NewConversationModal = ({ isOpen, onClose, onConfirm, isDark }) => {
 
           <div className="form-group">
             <label htmlFor="telefono">Teléfono</label>
-            <input
-              type="tel"
-              id="telefono"
-              value={telefono}
-              onChange={handleTelefonoChange}
-              placeholder="Ej: +521234567890"
-              className={`form-input ${telefonoError ? 'error' : ''}`}
-            />
+            <div className="phone-input-wrapper">
+              <select 
+                className="form-input country-select"
+                value={countryCode}
+                onChange={(e) => setCountryCode(e.target.value)}
+              >
+                <option value="+52">🇲🇽 +52</option>
+                <option value="+1">🇺🇸 +1</option>
+                <option value="+56">🇨🇱 +56</option>
+                <option value="+54">🇦🇷 +54</option>
+                <option value="+57">🇨🇴 +57</option>
+                <option value="+51">🇵🇪 +51</option>
+                <option value="+34">🇪🇸 +34</option>
+              </select>
+              <input
+                type="tel"
+                id="telefono"
+                value={telefono}
+                onChange={handleTelefonoChange}
+                placeholder="55 1234 5678"
+                className={`form-input phone-number-input ${telefonoError ? 'error' : ''}`}
+              />
+            </div>
             {telefonoError && <span className="error-text">{telefonoError}</span>}
           </div>
 

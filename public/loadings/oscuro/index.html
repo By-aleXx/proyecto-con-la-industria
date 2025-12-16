@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Réplica del icono</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+</head>
+
+<body>
+  <div class="stage">
+    <!-- SVG construido con arcos para aproximar el icono original -->
+    <svg viewBox="0 0 200 200" class="logo" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Icono réplica">
+      <!-- fondo circular oscuro -->
+      <g>
+
+        <circle class="bg-circle" cx="100" cy="100" r="80" fill="var(--ring-bg)" />
+
+        <!-- Outer arcs: base oscuro completo + arco blanco encima que actúa como cuenta atrás -->
+        <g transform="rotate(-90 100 100)">
+          <!-- dark base (full ring) -->
+          <circle class="arc dark-arc" cx="100" cy="100" r="60" fill="none" stroke="var(--dark)" stroke-width="20"
+            stroke-dasharray="376" stroke-dashoffset="0" />
+
+          <!-- white countdown on top -->
+          <circle class="arc white-arc countdown" cx="100" cy="100" r="60" fill="none" stroke="var(--white)"
+            stroke-width="20" stroke-dasharray="376" stroke-dashoffset="0" />
+        </g>
+
+        <!-- Loader dentro del SVG, perfectamente centrado -->
+        <foreignObject x="70" y="65" width="80" height="80">
+          <div class="loader-wrapper-svg">
+            <span class="loader"></span>
+          </div>
+        </foreignObject>
+
+        <!-- Original image that appears after squares -->
+        <g class="center-logo" aria-hidden="true">
+          <image href="imagen/cesantoni-center-logo.svg" x="35" y="35" width="120" height="120"
+            preserveAspectRatio="xMidYMid meet" opacity="0" />
+        </g>
+      </g>
+    </svg>
+  </div>
+</body>
+
+</html>

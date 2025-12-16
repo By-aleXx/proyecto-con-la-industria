@@ -1,0 +1,294 @@
+.loader-wrapper-svg {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Loader: visible al inicio y oculto cuando aparece la imagen; usa ciclo total con pausa */
+  animation: loaderFade var(--cycle) ease-in-out infinite;
+}
+/* Dual color circular loader spinner */
+.loader-wrapper {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  pointer-events: none;
+  z-index: 2;
+}
+.loader {
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  display: inline-block;
+  border-top: 8px solid #FFF;
+  border-right: 8px solid transparent;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+  position: relative;
+}
+.loader::after {
+  content: '';
+  box-sizing: border-box;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  border-left: 8px solid #FF3D00;
+  border-bottom: 8px solid transparent;
+  animation: rotation 0.5s linear infinite reverse;
+}
+.loader {
+  width: 63px;
+  height: 63px;
+  border-radius: 50%;
+  display: inline-block;
+  border-top: 8px solid #FFF;
+  border-right: 8px solid transparent;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+  position: relative;
+}
+.loader::after {
+  content: '';
+  box-sizing: border-box;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 63px;
+  height: 63px;
+  border-radius: 50%;
+  border-left: 8px solid #FFF;
+  border-bottom: 8px solid transparent;
+  animation: rotation 0.5s linear infinite reverse;
+}
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+:root{
+  --bg: #111217; /* page background */
+  --ring-bg: #111217; /* inside circle (same as page to look like cutout) */
+  --white: #f6f7f8;
+  --dark: #0b0b0b;
+  --duration: 14s; /* duración activa del ciclo (movimiento) */
+  --pause: 2s;     /* pausa entre ciclos */
+  --cycle: calc(var(--duration) + var(--pause)); /* total = movimiento + pausa */
+}
+html,body{height:100%;}
+body{
+  margin:0;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(180deg,#0f1115 0%, #0b0c10 100%);
+  font-family:system-ui,Segoe UI,Roboto,Arial;
+}
+.stage{
+  width:280px;
+  height:280px;
+  display:grid;
+  place-items:center;
+  background:transparent;
+}
+.logo{width:70%;height:auto;display:block}
+
+/* Slight adjustments to stroke alignment to better match the photo */
+.arc{filter:drop-shadow(0 0 0 rgba(0,0,0,0));}
+.arc{stroke-linecap:butt}
+.white-arc{stroke-linejoin:round}
+
+/* Make inner small C stroke thinner and smoother */
+svg circle[stroke-width="12"]{stroke-linejoin:round}
+
+/* responsive */
+@media (max-width:420px){
+  .stage{width:200px;height:200px}
+}
+
+/* Countdown animation: reduce stroke-dashoffset so the white arc "runs" like a clock */
+.countdown{
+  transform-origin: 100px 100px; /* center */
+  /* circumference for r=60 is ~376.99, we set dasharray to 376 and animate dashoffset from 0 to 376 */
+  stroke-dashoffset: 0;
+  /* draw -> undraw: animate to full offset so arc disappears like a countdown */
+  animation: tick var(--cycle) linear infinite;
+}
+
+@keyframes tick{
+  /* Constant-speed movement segments with pauses at 6/7/9/11.
+     Percentages are arranged so the total time equals --duration and
+     stroke-dashoffset always moves monotonically (no backwards jumps).
+  */
+  0%     { stroke-dashoffset: 0;    stroke-opacity: 1; }
+  /* reach half (6 o'clock) by 38.5% of the total cycle (0.875 * 44) */
+  38.5%  { stroke-dashoffset: -188; stroke-opacity: 1; }
+
+  /* 6 o'clock pause (short blink) */
+  40.3%  { stroke-dashoffset: -188; stroke-opacity: 0; }
+  41.6%  { stroke-dashoffset: -188; stroke-opacity: 1; }
+  42.9%  { stroke-dashoffset: -188; stroke-opacity: 0; }
+  44.6%  { stroke-dashoffset: -188; stroke-opacity: 1; }
+
+  /* move to 7 o'clock (slower) */
+  50.8%  { stroke-dashoffset: -220; stroke-opacity: 1; }
+  /* 7 o'clock short blink */
+  52.5%  { stroke-dashoffset: -220; stroke-opacity: 0; }
+  54.3%  { stroke-dashoffset: -220; stroke-opacity: 1; }
+
+  /* move to 9 o'clock (slower) */
+  64.8%  { stroke-dashoffset: -282; stroke-opacity: 1; }
+  /* 9 o'clock short blink */
+  66.5%  { stroke-dashoffset: -282; stroke-opacity: 0; }
+  68.3%  { stroke-dashoffset: -282; stroke-opacity: 1; }
+
+  /* move to 11 o'clock (slower) */
+  78.8%  { stroke-dashoffset: -344; stroke-opacity: 1; }
+  /* 11 o'clock longer pause (longer off span) */
+  80.5%  { stroke-dashoffset: -344; stroke-opacity: 0; }
+  82.3%  { stroke-dashoffset: -344; stroke-opacity: 0; }
+  84.0%  { stroke-dashoffset: -344; stroke-opacity: 1; }
+
+  /* finish by 87.5% (movement done), then hold for the 2s pause */
+  85.8%  { stroke-dashoffset: -360; stroke-opacity: 1; }
+  87.5%  { stroke-dashoffset: -376; stroke-opacity: 1; }
+  100%   { stroke-dashoffset: -376; stroke-opacity: 1; }
+}
+
+/* Background continuous clockwise spin with slight pulse */
+.bg-circle{
+  transform-origin: 100px 100px;
+  /* spin clockwise once every 12s and apply a tiny pulse */
+  animation: bgspin 12s linear infinite;
+  animation-play-state: paused;
+}
+
+@keyframes bgspin{
+  0%{ transform: scale(1) rotate(0deg); opacity:1 }
+  50%{ transform: scale(0.995) rotate(180deg); opacity:0.98 }
+  100%{ transform: scale(1) rotate(360deg); opacity:1 }
+}
+
+/* pause animations when hovering for inspection */
+.stage:hover .countdown, .stage:hover .bg-circle{
+  animation-play-state: paused;
+}
+
+/* Rotating squares animation - Stage 1 */
+/* Rotating squares CSS animation with progressive acceleration */
+.rotating-squares {
+  transform-origin: center center;
+}
+
+.orbit {
+  animation: spinAccelerate 6s cubic-bezier(0.42, 0, 0.58, 1) infinite;
+}
+
+.orbit.cw {
+  animation-name: spinAccelerateCW;
+}
+
+.orbit.ccw {
+  animation-name: spinAccelerateCCW;
+}
+
+@keyframes spinAccelerateCW {
+  0% {
+    transform: rotate(0deg);
+  }
+  30% {
+    transform: rotate(45deg);
+  }
+  60% {
+    transform: rotate(180deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spinAccelerateCCW {
+  0% {
+    transform: rotate(0deg);
+  }
+  30% {
+    transform: rotate(-45deg);
+  }
+  60% {
+    transform: rotate(-180deg);
+  }
+  100% {
+    transform: rotate(-360deg);
+  }
+}
+
+.square {
+  animation: fadeOutSquares 6s ease-in-out infinite;
+}
+
+@keyframes fadeOutSquares {
+  0%, 60% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Imagen: usar ciclo total (duración + pausa) */
+.center-logo image {
+  animation: showImageOverCountdown var(--cycle) ease-in-out infinite;
+}
+
+@keyframes showImageOverCountdown {
+  /* Oculta hasta ~60% del movimiento (52.5% del ciclo) */
+  0%, 52.5% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  /* Aparece y hace un ligero overshoot poco después */
+  61.25% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+  /* Se estabiliza visible durante el resto del movimiento */
+  74.375%, 83.125% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  /* Al finalizar el movimiento (87.5% del ciclo), empieza a desvanecer */
+  87.5% {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  /* Permanece oculta durante la pausa (hasta 100%) */
+  100% {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
+/* Loader visible hasta 52.5% (60% del movimiento); oculto el resto del ciclo */
+@keyframes loaderFade {
+  0%, 52.5% {
+    opacity: 1;
+    visibility: visible;
+  }
+  61.25%, 100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+
+

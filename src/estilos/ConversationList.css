@@ -525,6 +525,27 @@
   border-color: #e74c3c;
 }
 
+/* ========== SELECTOR DE PAÍS Y TELÉFONO ========== */
+.phone-input-wrapper {
+  display: flex;
+  gap: 8px;
+}
+
+.country-select {
+  width: auto;
+  min-width: 100px;
+  max-width: 110px;
+  padding: 14px 8px 14px 12px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.phone-number-input {
+  flex: 1;
+  min-width: 0;
+}
+
 .error-text {
   display: block;
   margin-top: 6px;
@@ -716,6 +737,21 @@
 
   .form-input {
     padding: 12px 14px;
+    font-size: 16px; /* Evita zoom en iOS */
+  }
+
+  .phone-input-wrapper {
+    gap: 6px;
+  }
+
+  .country-select {
+    min-width: 90px;
+    max-width: 95px;
+    padding: 12px 4px 12px 10px;
+    font-size: 16px; /* Evita zoom en iOS */
+  }
+
+  .phone-number-input {
     font-size: 16px; /* Evita zoom en iOS */
   }
 

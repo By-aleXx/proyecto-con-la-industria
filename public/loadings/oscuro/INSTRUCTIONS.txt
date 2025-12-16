@@ -1,0 +1,9 @@
+Para usar tu imagen en el centro del anillo:
+
+1) Copia la imagen que adjuntaste a esta carpeta de proyecto.
+2) Renómbrala exactamente como: center-logo.png
+3) Abre `index.html` en el navegador; el SVG cargará `center-logo.png` y lo colocará centrado dentro del anillo.
+
+Si quieres que convierta tu imagen a SVG vectorial (paths) para una réplica perfecta, dímelo y lo hago.
+
+Nota: actualmente `index.html` está configurado para cargar la imagen desde la ruta absoluta que nos diste. Para mayor portabilidad, considera copiar la imagen a esta carpeta y renombrarla a `center-logo.png`.
