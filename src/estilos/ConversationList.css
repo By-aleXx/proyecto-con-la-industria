@@ -533,6 +533,19 @@
   cursor: not-allowed;
 }
 
+/* Botón Iniciar Conversación con icono */
+.btn-iniciar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-iniciar .btn-icon {
+  display: none;
+  flex-shrink: 0;
+}
+
 /* ========== INDICADOR INFERIOR ========== */
 .bottom-indicator {
   display: flex;
@@ -648,6 +661,21 @@
   .form-input {
     padding: 12px 14px;
     font-size: 16px; /* Evita zoom en iOS */
+  }
+
+  /* Botón Iniciar: mostrar icono, ocultar texto */
+  .btn-iniciar .btn-text {
+    display: none;
+  }
+
+  .btn-iniciar .btn-icon {
+    display: block;
+  }
+
+  .btn-iniciar {
+    flex: 0;
+    padding: 14px 16px;
+    min-width: 54px;
   }
 }
 

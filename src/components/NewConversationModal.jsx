@@ -111,10 +111,14 @@ const NewConversationModal = ({ isOpen, onClose, onConfirm, isDark }) => {
             </button>
             <button 
               type="submit" 
-              className="btn-primary"
+              className="btn-primary btn-iniciar"
               disabled={!!telefonoError}
             >
-              Iniciar Conversación
+              <span className="btn-text">Iniciar Conversación</span>
+              <svg className="btn-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 2L11 13"></path>
+                <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
+              </svg>
             </button>
           </div>
         </form>
