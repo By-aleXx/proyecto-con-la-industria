@@ -7,6 +7,7 @@ import chatService from '../services/chatService';
 import ThemeToggle from './ThemeToggle';
 import ChangePasswordModal from './ChangePasswordModal';
 import ColorPickerModal from './ColorPickerModal';
+import InitialQuestionnaire from './InitialQuestionnaire';
 import '../estilos/index.css';
 import '../estilos/ChatRecommendations.css';
 
@@ -25,6 +26,7 @@ const ChatRecommendations = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
+  const [showQuestionnaire, setShowQuestionnaire] = useState(false);
   
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -114,16 +116,32 @@ const ChatRecommendations = () => {
           }
         }
       } else {
-        // No hay historial, mostrar mensaje de bienvenida
-        const cliente = chatService.getCurrentClienteInfo();
-        setMessages([getWelcomeMessage(cliente)]);
+        // No hay historial - verificar si el cuestionario fue completado
+        const currentSId = chatService.getCurrentSessionId();
+        const questionnaireCompleted = chatService.isQuestionnaireCompleted(currentSId);
+        
+        if (!questionnaireCompleted) {
+          // Mostrar cuestionario para nueva conversación
+          setShowQuestionnaire(true);
+        } else {
+          // Cuestionario completado pero sin historial aún
+          const cliente = chatService.getCurrentClienteInfo();
+          setMessages([getWelcomeMessage(cliente)]);
+        }
         setIsNewConversation(true);
       }
     } catch (error) {
       console.error('Error cargando historial:', error);
-      // En caso de error, mostrar mensaje de bienvenida
-      const cliente = chatService.getCurrentClienteInfo();
-      setMessages([getWelcomeMessage(cliente)]);
+      // En caso de error, verificar cuestionario
+      const currentSId = chatService.getCurrentSessionId();
+      const questionnaireCompleted = chatService.isQuestionnaireCompleted(currentSId);
+      
+      if (!questionnaireCompleted) {
+        setShowQuestionnaire(true);
+      } else {
+        const cliente = chatService.getCurrentClienteInfo();
+        setMessages([getWelcomeMessage(cliente)]);
+      }
       setIsNewConversation(true);
     } finally {
       setIsLoadingHistory(false);
@@ -165,15 +183,23 @@ const ChatRecommendations = () => {
     }
 
     if (currentSessionId) {
+      // Verificar si el cuestionario ya fue completado para esta sesión
+      const questionnaireCompleted = chatService.isQuestionnaireCompleted(currentSessionId);
+      
       setSessionId(currentSessionId);
       // Cargar historial existente
       loadConversationHistory(currentSessionId);
+      
+      // Si no hay historial completado y es nueva, mostrar cuestionario
+      if (!questionnaireCompleted) {
+        // Verificamos después de cargar si realmente hay historial
+      }
     } else {
-      // Nueva conversación sin session_id
+      // Nueva conversación sin session_id - mostrar cuestionario
       const newSessionId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
       setSessionId(newSessionId);
       chatService.setCurrentSessionId(newSessionId);
-      setMessages([getWelcomeMessage(currentClienteInfo)]);
+      setShowQuestionnaire(true);
       setIsLoadingHistory(false);
     }
   }, [loadConversationHistory, getWelcomeMessage]);
@@ -401,6 +427,76 @@ const ChatRecommendations = () => {
     navigate('/conversaciones');
   };
 
+  // Manejar cuando se completa el cuestionario
+  const handleQuestionnaireComplete = async (initialMessage) => {
+    setShowQuestionnaire(false);
+    
+    // Marcar cuestionario como completado
+    chatService.setQuestionnaireCompleted(sessionId);
+    
+    // Mostrar mensaje de bienvenida primero
+    const welcomeMsg = getWelcomeMessage(clienteInfo);
+    setMessages([welcomeMsg]);
+    
+    // Agregar el mensaje del usuario basado en las respuestas
+    const userMessage = {
+      id: Date.now(),
+      type: 'user',
+      text: initialMessage,
+      timestamp: new Date()
+    };
+    setMessages(prev => [...prev, userMessage]);
+    setIsTyping(true);
+
+    try {
+      const historial = [
+        { role: 'assistant', content: welcomeMsg.text },
+        { role: 'user', content: initialMessage }
+      ];
+
+      // Enviar primer mensaje con info del cliente
+      const response = await chatService.sendMessage(initialMessage, sessionId, historial, clienteInfo || {});
+
+      setIsNewConversation(false);
+
+      const aiMessage = {
+        id: Date.now() + 1,
+        type: 'ai',
+        text: response.respuesta,
+        timestamp: new Date(),
+        metadata: response.metadata
+      };
+      
+      setMessages(prev => [...prev, aiMessage]);
+      
+      if (response.session_id && response.session_id !== sessionId) {
+        setSessionId(response.session_id);
+        chatService.setCurrentSessionId(response.session_id);
+      }
+      
+    } catch (error) {
+      console.error('Error al enviar mensaje inicial:', error);
+      
+      const errorMessage = {
+        id: Date.now() + 1,
+        type: 'ai',
+        text: 'Lo siento, hubo un error al procesar tu solicitud. Por favor, intenta de nuevo.',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
+
+  // Manejar cuando se quiere volver desde el cuestionario
+  const handleQuestionnaireBack = () => {
+    // Limpiar sesión y volver a la lista
+    chatService.clearCurrentSessionId();
+    chatService.clearCurrentClienteInfo();
+    navigate('/conversaciones');
+  };
+
   const handleChangePasswordSubmit = async (oldPassword, newPassword) => {
     await changePassword(oldPassword, newPassword);
     alert('Contraseña cambiada exitosamente');
@@ -418,6 +514,18 @@ const ChatRecommendations = () => {
   };
 
   const clienteDisplayName = getClienteDisplayName();
+
+  // Si se debe mostrar el cuestionario inicial
+  if (showQuestionnaire) {
+    return (
+      <InitialQuestionnaire
+        onComplete={handleQuestionnaireComplete}
+        onBack={handleQuestionnaireBack}
+        isDark={isDark}
+        clienteInfo={clienteInfo}
+      />
+    );
+  }
 
   return (
     <div className={`chat-main-container ${isDark ? 'dark' : 'light'}`}>

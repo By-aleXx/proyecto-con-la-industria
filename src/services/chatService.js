@@ -75,6 +75,31 @@ class ChatService {
   clearCurrentClienteInfo() {
     localStorage.removeItem('currentClienteInfo');
   }
+
+  // Verificar si el cuestionario fue completado para una sesión
+  isQuestionnaireCompleted(sessionId) {
+    if (!sessionId) return false;
+    const completedSessions = JSON.parse(localStorage.getItem('questionnaireCompleted') || '[]');
+    return completedSessions.includes(sessionId);
+  }
+
+  // Marcar cuestionario como completado para una sesión
+  setQuestionnaireCompleted(sessionId) {
+    if (!sessionId) return;
+    const completedSessions = JSON.parse(localStorage.getItem('questionnaireCompleted') || '[]');
+    if (!completedSessions.includes(sessionId)) {
+      completedSessions.push(sessionId);
+      localStorage.setItem('questionnaireCompleted', JSON.stringify(completedSessions));
+    }
+  }
+
+  // Limpiar estado del cuestionario para una sesión
+  clearQuestionnaireCompleted(sessionId) {
+    if (!sessionId) return;
+    const completedSessions = JSON.parse(localStorage.getItem('questionnaireCompleted') || '[]');
+    const filtered = completedSessions.filter(id => id !== sessionId);
+    localStorage.setItem('questionnaireCompleted', JSON.stringify(filtered));
+  }
 }
 
 const chatServiceInstance = new ChatService();
