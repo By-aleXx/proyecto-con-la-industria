@@ -471,29 +471,22 @@ const ChatRecommendations = () => {
       <div className="chat-container">
         {isLoadingHistory ? (
           <div className="chat-loading-history">
-            <div className="loading-grid-container">
-              <div className="loading-grid">
-                <div className="loading-square" style={{'--delay': '0.1s'}}></div>
-                <div className="loading-square" style={{'--delay': '0.2s'}}></div>
-                <div className="loading-square" style={{'--delay': '0.3s'}}></div>
-                <div className="loading-square" style={{'--delay': '0.4s'}}></div>
-                <div className="loading-square" style={{'--delay': '0.5s'}}></div>
-                <div className="loading-square" style={{'--delay': '0.6s'}}></div>
-                <div className="loading-square" style={{'--delay': '0.7s'}}></div>
-                <div className="loading-square" style={{'--delay': '0.8s'}}></div>
-                <div className="loading-square" style={{'--delay': '0.9s'}}></div>
-              </div>
-              <div className="loading-grid right">
-                <div className="loading-square" style={{'--delay': '0.1s'}}></div>
-                <div className="loading-square" style={{'--delay': '0.2s'}}></div>
-                <div className="loading-square" style={{'--delay': '0.3s'}}></div>
-                <div className="loading-square" style={{'--delay': '0.4s'}}></div>
-                <div className="loading-square" style={{'--delay': '0.5s'}}></div>
-                <div className="loading-square" style={{'--delay': '0.6s'}}></div>
-                <div className="loading-square" style={{'--delay': '0.7s'}}></div>
-                <div className="loading-square" style={{'--delay': '0.8s'}}></div>
-                <div className="loading-square" style={{'--delay': '0.9s'}}></div>
-              </div>
+            <div className="cesantoni-loader">
+              <svg viewBox="0 0 200 200" className="cesantoni-loader-svg" xmlns="http://www.w3.org/2000/svg">
+                <circle className="cesantoni-bg-circle" cx="100" cy="100" r="80" />
+                <g transform="rotate(-90 100 100)">
+                  <circle className="cesantoni-dark-arc" cx="100" cy="100" r="60" fill="none" strokeWidth="20" strokeDasharray="376" strokeDashoffset="0" />
+                  <circle className="cesantoni-white-arc cesantoni-countdown" cx="100" cy="100" r="60" fill="none" strokeWidth="20" strokeDasharray="376" strokeDashoffset="0" />
+                </g>
+                <foreignObject x="70" y="65" width="80" height="80">
+                  <div className="cesantoni-loader-wrapper">
+                    <span className="cesantoni-spinner"></span>
+                  </div>
+                </foreignObject>
+                <g className="cesantoni-center-logo">
+                  <image href="/loadings/oscuro/imagen/center-logo.png" x="35" y="35" width="120" height="120" preserveAspectRatio="xMidYMid meet" opacity="0" />
+                </g>
+              </svg>
             </div>
             <p className="loading-text">Cargando conversación...</p>
           </div>
@@ -574,29 +567,10 @@ const ChatRecommendations = () => {
                     <div className="avatar-fallback" style={{display: 'none'}}>C</div>
                   </div>
                   <div className="ai-message">
-                    <div className="loading-grid-container">
-                      <div className="loading-grid">
-                        <div className="loading-square" style={{'--delay': '0.1s'}}></div>
-                        <div className="loading-square" style={{'--delay': '0.2s'}}></div>
-                        <div className="loading-square" style={{'--delay': '0.3s'}}></div>
-                        <div className="loading-square" style={{'--delay': '0.4s'}}></div>
-                        <div className="loading-square" style={{'--delay': '0.5s'}}></div>
-                        <div className="loading-square" style={{'--delay': '0.6s'}}></div>
-                        <div className="loading-square" style={{'--delay': '0.7s'}}></div>
-                        <div className="loading-square" style={{'--delay': '0.8s'}}></div>
-                        <div className="loading-square" style={{'--delay': '0.9s'}}></div>
-                      </div>
-                      <div className="loading-grid right">
-                        <div className="loading-square" style={{'--delay': '0.1s'}}></div>
-                        <div className="loading-square" style={{'--delay': '0.2s'}}></div>
-                        <div className="loading-square" style={{'--delay': '0.3s'}}></div>
-                        <div className="loading-square" style={{'--delay': '0.4s'}}></div>
-                        <div className="loading-square" style={{'--delay': '0.5s'}}></div>
-                        <div className="loading-square" style={{'--delay': '0.6s'}}></div>
-                        <div className="loading-square" style={{'--delay': '0.7s'}}></div>
-                        <div className="loading-square" style={{'--delay': '0.8s'}}></div>
-                        <div className="loading-square" style={{'--delay': '0.9s'}}></div>
-                      </div>
+                    <div className="typing-dots">
+                      <span className="typing-dot"></span>
+                      <span className="typing-dot"></span>
+                      <span className="typing-dot"></span>
                     </div>
                   </div>
                 </div>

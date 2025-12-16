@@ -1,0 +1,214 @@
+/* Estilos para LoadingScreen con animación del nuevo logo */
+
+:root {
+  --loading-bg: #111217;
+  --loading-ring-bg: #111217;
+  --loading-white: #f6f7f8;
+  --loading-dark: #0b0b0b;
+  --loading-duration: 14s;
+  --loading-pause: 2s;
+  --loading-cycle: calc(var(--loading-duration) + var(--loading-pause));
+}
+
+/* Contenedor principal */
+.loading-screen-container {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, #0f1115 0%, #0b0c10 100%);
+  font-family: system-ui, Segoe UI, Roboto, Arial;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Modo claro - mantener el gradiente oscuro para la animación */
+.loading-screen-container.light {
+  background: linear-gradient(180deg, #1a1d24 0%, #0f1115 100%);
+}
+
+/* Modo oscuro */
+.loading-screen-container.dark {
+  background: linear-gradient(180deg, #0f1115 0%, #0b0c10 100%);
+}
+
+/* Stage de la animación */
+.loading-stage {
+  width: 280px;
+  height: 280px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+}
+
+.loading-logo-svg {
+  width: 70%;
+  height: auto;
+  display: block;
+}
+
+/* Círculo de fondo */
+.loading-bg-circle {
+  transform-origin: 100px 100px;
+  animation: loadingBgSpin 12s linear infinite;
+  animation-play-state: paused;
+}
+
+@keyframes loadingBgSpin {
+  0% { transform: scale(1) rotate(0deg); opacity: 1; }
+  50% { transform: scale(0.995) rotate(180deg); opacity: 0.98; }
+  100% { transform: scale(1) rotate(360deg); opacity: 1; }
+}
+
+/* Arcos */
+.loading-arc {
+  filter: drop-shadow(0 0 0 rgba(0,0,0,0));
+  stroke-linecap: butt;
+}
+
+.loading-white-arc {
+  stroke-linejoin: round;
+}
+
+/* Countdown animation */
+.loading-countdown {
+  transform-origin: 100px 100px;
+  stroke-dashoffset: 0;
+  animation: loadingTick var(--loading-cycle) linear infinite;
+}
+
+@keyframes loadingTick {
+  0% { stroke-dashoffset: 0; stroke-opacity: 1; }
+  38.5% { stroke-dashoffset: -188; stroke-opacity: 1; }
+  40.3% { stroke-dashoffset: -188; stroke-opacity: 0; }
+  41.6% { stroke-dashoffset: -188; stroke-opacity: 1; }
+  42.9% { stroke-dashoffset: -188; stroke-opacity: 0; }
+  44.6% { stroke-dashoffset: -188; stroke-opacity: 1; }
+  50.8% { stroke-dashoffset: -220; stroke-opacity: 1; }
+  52.5% { stroke-dashoffset: -220; stroke-opacity: 0; }
+  54.3% { stroke-dashoffset: -220; stroke-opacity: 1; }
+  64.8% { stroke-dashoffset: -282; stroke-opacity: 1; }
+  66.5% { stroke-dashoffset: -282; stroke-opacity: 0; }
+  68.3% { stroke-dashoffset: -282; stroke-opacity: 1; }
+  78.8% { stroke-dashoffset: -344; stroke-opacity: 1; }
+  80.5% { stroke-dashoffset: -344; stroke-opacity: 0; }
+  82.3% { stroke-dashoffset: -344; stroke-opacity: 0; }
+  84.0% { stroke-dashoffset: -344; stroke-opacity: 1; }
+  85.8% { stroke-dashoffset: -360; stroke-opacity: 1; }
+  87.5% { stroke-dashoffset: -376; stroke-opacity: 1; }
+  100% { stroke-dashoffset: -376; stroke-opacity: 1; }
+}
+
+/* Loader wrapper dentro del SVG */
+.loading-loader-wrapper-svg {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: loadingLoaderFade var(--loading-cycle) ease-in-out infinite;
+}
+
+/* Dual color circular loader spinner */
+.loading-spinner {
+  width: 63px;
+  height: 63px;
+  border-radius: 50%;
+  display: inline-block;
+  border-top: 8px solid #FFF;
+  border-right: 8px solid transparent;
+  box-sizing: border-box;
+  animation: loadingRotation 1s linear infinite;
+  position: relative;
+}
+
+.loading-spinner::after {
+  content: '';
+  box-sizing: border-box;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 63px;
+  height: 63px;
+  border-radius: 50%;
+  border-left: 8px solid #FFF;
+  border-bottom: 8px solid transparent;
+  animation: loadingRotation 0.5s linear infinite reverse;
+}
+
+@keyframes loadingRotation {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Imagen central que aparece después del countdown */
+.loading-center-logo image {
+  animation: loadingShowImage var(--loading-cycle) ease-in-out infinite;
+}
+
+@keyframes loadingShowImage {
+  0%, 52.5% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  61.25% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+  74.375%, 83.125% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  87.5% {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
+/* Loader visible hasta 52.5% del ciclo */
+@keyframes loadingLoaderFade {
+  0%, 52.5% {
+    opacity: 1;
+    visibility: visible;
+  }
+  61.25%, 100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* Texto de carga opcional */
+.loading-text-container {
+  position: absolute;
+  bottom: 80px;
+  text-align: center;
+  color: var(--loading-white);
+  font-size: 1.2rem;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+/* Theme toggle container */
+.loading-theme-toggle {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 1000;
+}
+
+/* Responsive */
+@media (max-width: 420px) {
+  .loading-stage {
+    width: 200px;
+    height: 200px;
+  }
+  
+  .loading-text-container {
+    bottom: 60px;
+    font-size: 1rem;
+  }
+}
+

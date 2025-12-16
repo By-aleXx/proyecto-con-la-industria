@@ -529,6 +529,55 @@
   }
 }
 
+/* ========== TYPING DOTS - Tres puntitos animados ========== */
+.typing-dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 20px;
+  background: var(--surface);
+  border-radius: 20px 20px 20px 4px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
+}
+
+.typing-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  animation: typingBounce 1.4s ease-in-out infinite;
+}
+
+.typing-dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typingBounce {
+  0%, 60%, 100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-10px) scale(1.1);
+    opacity: 1;
+  }
+}
+
+/* Modo oscuro para typing dots */
+.dark .typing-dots {
+  background: var(--surface);
+  border-color: var(--border-light);
+}
+
 /* ========== LOADING GRID ANIMATION ========== */
 .loading-grid-container {
   display: flex;
@@ -1174,4 +1223,183 @@
 
 .dark .indicator-bar {
   background: var(--border-light);
+}
+
+/* ========== CESANTONI LOADER - Nueva animación del logo ========== */
+:root {
+  --cesantoni-bg: #111217;
+  --cesantoni-ring-bg: #111217;
+  --cesantoni-white: #f6f7f8;
+  --cesantoni-dark: #0b0b0b;
+  --cesantoni-duration: 14s;
+  --cesantoni-pause: 2s;
+  --cesantoni-cycle: calc(var(--cesantoni-duration) + var(--cesantoni-pause));
+}
+
+.cesantoni-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 140px;
+  height: 140px;
+}
+
+.cesantoni-loader-small {
+  width: 100px;
+  height: 100px;
+}
+
+.cesantoni-loader-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.cesantoni-bg-circle {
+  fill: var(--cesantoni-ring-bg);
+  transform-origin: 100px 100px;
+}
+
+.cesantoni-dark-arc {
+  stroke: var(--cesantoni-dark);
+  stroke-linecap: butt;
+}
+
+.cesantoni-white-arc {
+  stroke: var(--cesantoni-white);
+  stroke-linecap: butt;
+  stroke-linejoin: round;
+}
+
+.cesantoni-countdown {
+  transform-origin: 100px 100px;
+  stroke-dashoffset: 0;
+  animation: cesantoniTick var(--cesantoni-cycle) linear infinite;
+}
+
+@keyframes cesantoniTick {
+  0% { stroke-dashoffset: 0; stroke-opacity: 1; }
+  38.5% { stroke-dashoffset: -188; stroke-opacity: 1; }
+  40.3% { stroke-dashoffset: -188; stroke-opacity: 0; }
+  41.6% { stroke-dashoffset: -188; stroke-opacity: 1; }
+  42.9% { stroke-dashoffset: -188; stroke-opacity: 0; }
+  44.6% { stroke-dashoffset: -188; stroke-opacity: 1; }
+  50.8% { stroke-dashoffset: -220; stroke-opacity: 1; }
+  52.5% { stroke-dashoffset: -220; stroke-opacity: 0; }
+  54.3% { stroke-dashoffset: -220; stroke-opacity: 1; }
+  64.8% { stroke-dashoffset: -282; stroke-opacity: 1; }
+  66.5% { stroke-dashoffset: -282; stroke-opacity: 0; }
+  68.3% { stroke-dashoffset: -282; stroke-opacity: 1; }
+  78.8% { stroke-dashoffset: -344; stroke-opacity: 1; }
+  80.5% { stroke-dashoffset: -344; stroke-opacity: 0; }
+  82.3% { stroke-dashoffset: -344; stroke-opacity: 0; }
+  84.0% { stroke-dashoffset: -344; stroke-opacity: 1; }
+  85.8% { stroke-dashoffset: -360; stroke-opacity: 1; }
+  87.5% { stroke-dashoffset: -376; stroke-opacity: 1; }
+  100% { stroke-dashoffset: -376; stroke-opacity: 1; }
+}
+
+.cesantoni-loader-wrapper {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: cesantoniLoaderFade var(--cesantoni-cycle) ease-in-out infinite;
+}
+
+.cesantoni-spinner {
+  width: 63px;
+  height: 63px;
+  border-radius: 50%;
+  display: inline-block;
+  border-top: 8px solid #FFF;
+  border-right: 8px solid transparent;
+  box-sizing: border-box;
+  animation: cesantoniRotation 1s linear infinite;
+  position: relative;
+}
+
+.cesantoni-spinner::after {
+  content: '';
+  box-sizing: border-box;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 63px;
+  height: 63px;
+  border-radius: 50%;
+  border-left: 8px solid #FFF;
+  border-bottom: 8px solid transparent;
+  animation: cesantoniRotation 0.5s linear infinite reverse;
+}
+
+@keyframes cesantoniRotation {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.cesantoni-center-logo image {
+  animation: cesantoniShowImage var(--cesantoni-cycle) ease-in-out infinite;
+}
+
+@keyframes cesantoniShowImage {
+  0%, 52.5% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  61.25% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+  74.375%, 83.125% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  87.5% {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
+@keyframes cesantoniLoaderFade {
+  0%, 52.5% {
+    opacity: 1;
+    visibility: visible;
+  }
+  61.25%, 100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* Responsive para el loader de Cesantoni */
+@media (max-width: 480px) {
+  .cesantoni-loader {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .cesantoni-loader-small {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .cesantoni-spinner {
+    width: 50px;
+    height: 50px;
+    border-top-width: 6px;
+    border-right-width: 6px;
+  }
+  
+  .cesantoni-spinner::after {
+    width: 50px;
+    height: 50px;
+    border-left-width: 6px;
+    border-bottom-width: 6px;
+  }
 }
